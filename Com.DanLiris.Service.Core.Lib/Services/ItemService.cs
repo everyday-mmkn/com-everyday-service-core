@@ -51,7 +51,7 @@ namespace Com.DanLiris.Service.Core.Lib.Services
             /* Const Select */
             List<string> SelectedFields = new List<string>()
             {
-                "_id", "dataDestination[0].code", "dataDestination[0].name", "dataDestination[0].ArticleRealizationOrder"
+                "_id", "dataDestination[0].code", "dataDestination[0].name", "dataDestination[0].ArticleRealizationOrder", "dataDestination[0].color", "dataDestination[0].ImagePath", "dataDestination[0].ImgFile"
             };
 
             
@@ -187,7 +187,8 @@ namespace Com.DanLiris.Service.Core.Lib.Services
                     Uom = item.Uom,
                     Size = item.Size,
                     ImagePath = item.ImagePath,
-                    ImgFile = item.ImgFile
+                    ImgFile = item.ImgFile,
+                    color = item.ColorDocName
                     
                 }
             };
