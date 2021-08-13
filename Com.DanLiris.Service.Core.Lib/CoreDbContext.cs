@@ -97,6 +97,7 @@ namespace Com.DanLiris.Service.Core.Lib
         public DbSet<Store> Stores { get; set; }
         public DbSet<Bank> Banks { get; set; }
         public DbSet<CardType> CardTypes { get; set; }
+        public DbSet<MasterSource> MasterSources { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
