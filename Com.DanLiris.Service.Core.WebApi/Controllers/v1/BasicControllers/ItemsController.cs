@@ -336,5 +336,28 @@ namespace Com.DanLiris.Service.Core.WebApi.Controllers.v1.BasicControllers
             }
         }
 
+        [HttpPut("update-qty-by-id/{_id}")]
+        public async Task<IActionResult> UpdateTotalQty([FromRoute] int _id, [FromBody] ItemViewModelUsername ViewModel)
+        {
+            try
+            {
+                Service.Username = ViewModel.Username;
+                Service.Token = ViewModel.Token;
+
+                await Service.UpdateTotalQtyAsync(_id, ViewModel.TotalQty, ViewModel.Username);
+
+                Dictionary<string, object> Result =
+                    new ResultFormatter(ApiVersion, General.CREATED_STATUS_CODE, General.OK_MESSAGE)
+                    .Ok();
+                return NoContent();
+            }
+            catch (Exception e)
+            {
+                Dictionary<string, object> Result =
+                    new ResultFormatter(ApiVersion, General.INTERNAL_ERROR_STATUS_CODE, e.Message)
+                    .Fail();
+                return StatusCode(General.INTERNAL_ERROR_STATUS_CODE, Result);
+            }
+        }
     }
 }
