@@ -13,6 +13,7 @@ using Com.DanLiris.Service.Core.Lib.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using Com.Moonlay.Models;
 
 namespace Com.DanLiris.Service.Core.Lib.Services
 {
@@ -434,6 +435,7 @@ namespace Com.DanLiris.Service.Core.Lib.Services
             item.DomesticSale = itemVM.DomesticSale;
             item.InternationalSale = itemVM.InternationalSale;
             item.ArticleRealizationOrder = itemVM.dataDestination[0].ArticleRealizationOrder;
+            item.TotalQty = itemVM.TotalQty;
             if (!Equals(itemVM.process, null))
             {
                 item.ArticleProcessId = itemVM.process._id;
@@ -822,9 +824,20 @@ namespace Com.DanLiris.Service.Core.Lib.Services
 
             return await DbContext.SaveChangesAsync();
         }
-            //return await this.AzureImageService.UploadImage(model.GetType().Name, model.Id, model._CreatedUtc, model.ImagePath);
-            
+        //return await this.AzureImageService.UploadImage(model.GetType().Name, model.Id, model._CreatedUtc, model.ImagePath);
 
+
+        public async Task<int> UpdateTotalQtyAsync(int id, double totalQty, string username)
+        {
+            Item item = DbContext.Items.Where(y => y.Id == id).FirstOrDefault();
+            if(item != null)
+            {
+                item.TotalQty = item.TotalQty + totalQty;
+            }
+            item.FlagForUpdate(username, "core-service");
+            DbContext.Items.Update(item);
+            return await DbContext.SaveChangesAsync();
+        }
     }
 
 
