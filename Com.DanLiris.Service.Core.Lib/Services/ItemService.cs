@@ -838,6 +838,18 @@ namespace Com.DanLiris.Service.Core.Lib.Services
             DbContext.Items.Update(item);
             return await DbContext.SaveChangesAsync();
         }
+
+        public async Task<int> ReduceTotalQtyAsync(int id, double totalQty, string username)
+        {
+            Item item = DbContext.Items.Where(y => y.Id == id).FirstOrDefault();
+            if(item != null)
+            {
+                item.TotalQty = item.TotalQty - totalQty;
+            }
+            item.FlagForUpdate(username, "core-service");
+            DbContext.Items.Update(item);
+            return await DbContext.SaveChangesAsync();
+        }
     }
 
 
