@@ -137,12 +137,123 @@ namespace Com.DanLiris.Service.Core.Test.Controllers.ItemsController
                 Token = "token"
             };
         }
+        
+        public ItemViewModelUsername GenerateTestModelForUpdate()
+        {
+            string guid = Guid.NewGuid().ToString();
+
+            return new ItemViewModelUsername()
+            {
+                dataDestination = new List<ItemViewModelRead>()
+                {
+                    new ItemViewModelRead()
+                    {
+                        ArticleRealizationOrder = "123",
+                        code = "21000123",
+                        name = "name",
+                        Size = "S",
+                        Uom = "PCS",
+                        ImagePath = "/sales",
+                        ImgFile = "",
+                        Tags = "",
+                        Remark = "",
+                        Description = "",
+                    },
+                },
+                color = new ItemArticleColorViewModel()
+                {
+                    _id = 1,
+                    code = "code",
+                    name = "name"
+                },
+                process = new ItemArticleProcesViewModel()
+                {
+                    _id = 1,
+                    code = "code",
+                    name = "name"
+                },
+                materials = new ItemArticleMaterialViewModel()
+                {
+                    _id = 1,
+                    code = "code",
+                    name = "name"
+                },
+                materialCompositions = new ItemArticleMaterialCompositionViewModel()
+                {
+                    _id = 1,
+                    code = "code",
+                    name = "name"
+                },
+                collections = new ItemArticleCollectionViewModel()
+                {
+                    _id = 1,
+                    code = "code",
+                    name = "name"
+                },
+                seasons = new ItemArticleSeasonViewModel()
+                {
+                    _id = 1,
+                    code = "code",
+                    name = "name"
+                },
+                counters = new ItemArticleCounterViewModel()
+                {
+                    _id = 1,
+                    code = "code",
+                    name = "name"
+                },
+                subCounters = new ItemArticleSubCounterViewModel()
+                {
+                    _id = 1,
+                    code = "code",
+                    name = "name"
+                },
+                categories = new ItemArticleCategoryViewModel()
+                {
+                    _id = 1,
+                    code = "code",
+                    name = "name"
+                },
+                DomesticCOGS = 1000,
+                DomesticRetail = 0,
+                DomesticSale = 10000,
+                DomesticWholesale = 0,
+                InternationalCOGS = 0,
+                InternationalWholesale = 0,
+                InternationalRetail = 0,
+                InternationalSale = 0,
+                ImageFile = "",
+                _id = 1,
+                Username = "username",
+                Token = "token"
+            };
+        }
 
         [Fact]
         public async Task Post()
         {
             ItemViewModelUsername VM = GenerateTestModel();
-            var response = await this.Client.PostAsync(URI, new StringContent(JsonConvert.SerializeObject(VM).ToString(), Encoding.UTF8, "application/json"));
+            var response = await this.Client.PostAsync(URI+"/item", new StringContent(JsonConvert.SerializeObject(VM).ToString(), Encoding.UTF8, "application/json"));
+
+            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        }
+        
+        [Fact]
+        public async Task UpdateTotalQuantity()
+        {
+            ItemViewModelUsername VM = GenerateTestModelForUpdate();
+            var uri = $"{URI}/update-qty-by-id/{VM._id}";
+            var response = await this.Client.PutAsync(uri, new StringContent(JsonConvert.SerializeObject(VM).ToString(), Encoding.UTF8, "application/json"));
+
+            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        }
+        
+        [Fact]
+        public async Task ReduceTotalQuantity()
+        {
+            ItemViewModelUsername VM = GenerateTestModel();
+            var uri = $"{URI}/reduce-qty-by-id/{VM._id}";
+            var response = await this.Client.PutAsync(uri, new StringContent(JsonConvert.SerializeObject(VM).ToString(), Encoding.UTF8, "application/json"));
 
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         }

@@ -117,5 +117,6 @@ namespace Com.DanLiris.Service.Core.Lib.ViewModels
         public string ImageFile { get; set; }
         public string Username { get; set; }
         public string Token { get; set; }
+        public double TotalQty { get; set; }
     }
 }
