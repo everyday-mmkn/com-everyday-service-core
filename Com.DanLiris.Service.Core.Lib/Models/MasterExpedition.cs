@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Com.DanLiris.Service.Core.Lib.Models
 {
-    public class Expedition : StandardEntity, IValidatableObject
+    public class MasterExpedition : StandardEntity, IValidatableObject
     {
         [MaxLength(255)]
         public string UId { get; set; }

@@ -13,15 +13,15 @@ using System.Text;
 
 namespace Com.DanLiris.Service.Core.Lib.Services
 {
-    public class ExpeditionService : BasicService<CoreDbContext, Expedition>, IMap<Expedition, ExpeditionViewModel>
+    public class ExpeditionService : BasicService<CoreDbContext, MasterExpedition>, IMap<MasterExpedition, ExpeditionViewModel>
     {
         public ExpeditionService(IServiceProvider serviceProvider) : base(serviceProvider)
         {
         }
 
-        public override Tuple<List<Expedition>, int, Dictionary<string, string>, List<string>> ReadModel(int Page = 1, int Size = 25, string Order = "{}", List<string> Select = null, string Keyword = null, string Filter = "{}")
+        public override Tuple<List<MasterExpedition>, int, Dictionary<string, string>, List<string>> ReadModel(int Page = 1, int Size = 25, string Order = "{}", List<string> Select = null, string Keyword = null, string Filter = "{}")
         {
-            IQueryable<Expedition> Query = this.DbContext.Expeditions;
+            IQueryable<MasterExpedition> Query = this.DbContext.MasterExpeditions;
             Dictionary<string, object> FilterDictionary = JsonConvert.DeserializeObject<Dictionary<string, object>>(Filter);
             Query = ConfigureFilter(Query, FilterDictionary);
             Dictionary<string, string> OrderDictionary = JsonConvert.DeserializeObject<Dictionary<string, string>>(Order);
@@ -44,7 +44,7 @@ namespace Com.DanLiris.Service.Core.Lib.Services
             };
 
             Query = Query
-                .Select(b => new Expedition
+                .Select(b => new MasterExpedition
                 {
                     Id = b.Id,
                     Code = b.Code,
@@ -73,15 +73,15 @@ namespace Com.DanLiris.Service.Core.Lib.Services
             }
 
             /* Pagination */
-            Pageable<Expedition> pageable = new Pageable<Expedition>(Query, Page - 1, Size);
-            List<Expedition> Data = pageable.Data.ToList<Expedition>();
+            Pageable<MasterExpedition> pageable = new Pageable<MasterExpedition>(Query, Page - 1, Size);
+            List<MasterExpedition> Data = pageable.Data.ToList<MasterExpedition>();
 
             int TotalData = pageable.TotalCount;
 
             return Tuple.Create(Data, TotalData, OrderDictionary, SelectedFields);
         }
 
-        public ExpeditionViewModel MapToViewModel(Expedition expedition)
+        public ExpeditionViewModel MapToViewModel(MasterExpedition expedition)
         {
             ExpeditionViewModel expeditionVM = new ExpeditionViewModel();
 
@@ -105,9 +105,9 @@ namespace Com.DanLiris.Service.Core.Lib.Services
             return expeditionVM;
         }
 
-        public Expedition MapToModel(ExpeditionViewModel expeditionVM)
+        public MasterExpedition MapToModel(ExpeditionViewModel expeditionVM)
         {
-            Expedition expedition = new Expedition();
+            MasterExpedition expedition = new MasterExpedition();
 
             expedition.Id = expeditionVM._id;
             expedition.UId = expeditionVM.UId;
