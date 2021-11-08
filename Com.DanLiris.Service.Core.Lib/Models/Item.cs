@@ -124,6 +124,8 @@ namespace Com.DanLiris.Service.Core.Lib.Models
 
         public double? InternationalSale { get; set; }
 
+        public double TotalQty { get; set; }
+
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {

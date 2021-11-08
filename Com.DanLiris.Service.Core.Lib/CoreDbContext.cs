@@ -93,10 +93,11 @@ namespace Com.DanLiris.Service.Core.Lib
         public DbSet<Module> Modules { get; set; }
         public DbSet<ModuleDestination> ModuleDestinations { get; set; }
         public DbSet<ModuleSource> ModuleSources { get; set; }
-        public DbSet<Expedition> Expeditions { get; set; }
+        public DbSet<MasterExpedition> MasterExpeditions { get; set; }
         public DbSet<Store> Stores { get; set; }
         public DbSet<Bank> Banks { get; set; }
         public DbSet<CardType> CardTypes { get; set; }
+        public DbSet<MasterSource> MasterSources { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

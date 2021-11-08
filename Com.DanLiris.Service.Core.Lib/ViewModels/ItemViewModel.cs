@@ -205,6 +205,8 @@ namespace Com.DanLiris.Service.Core.Lib.ViewModels
 
         public string name { get; set; }
 
+        public string color { get; set; }
+
         public string Description { get; set; }
 
         public string Uom { get; set; }
@@ -236,6 +238,10 @@ namespace Com.DanLiris.Service.Core.Lib.ViewModels
         public double? InternationalRetail { get; set; }
 
         public double? InternationalSale { get; set; }
+
+        public string ColorCode { get; set; }
+
+        public string ColorDocName { get; set; }
     }
     public class ItemLoader
     {

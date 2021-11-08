@@ -310,5 +310,78 @@ namespace Com.DanLiris.Service.Core.WebApi.Controllers.v1.BasicControllers
             }
         }
 
+        [HttpPost("item")]
+        public async Task<IActionResult> PostItem([FromBody] ItemViewModelUsername ViewModel)
+        {
+            try
+            {
+                Item model = Service.ItemMapToModel(ViewModel);
+
+                Service.Username = ViewModel.Username;
+                Service.Token = ViewModel.Token;
+
+                await Service.CreateModel(model);
+
+                Dictionary<string, object> Result =
+                    new ResultFormatter(ApiVersion, General.CREATED_STATUS_CODE, General.OK_MESSAGE)
+                    .Ok();
+                return Created(String.Concat(HttpContext.Request.Path, "/", model.Id), Result);
+            }
+            catch (Exception e)
+            {
+                Dictionary<string, object> Result =
+                    new ResultFormatter(ApiVersion, General.INTERNAL_ERROR_STATUS_CODE, e.Message)
+                    .Fail();
+                return StatusCode(General.INTERNAL_ERROR_STATUS_CODE, Result);
+            }
+        }
+
+        [HttpPut("update-qty-by-id/{_id}")]
+        public async Task<IActionResult> UpdateTotalQty([FromRoute] int _id, [FromBody] ItemViewModelUsername ViewModel)
+        {
+            try
+            {
+                Service.Username = ViewModel.Username;
+                Service.Token = ViewModel.Token;
+
+                await Service.UpdateTotalQtyAsync(_id, ViewModel.TotalQty, ViewModel.Username);
+
+                Dictionary<string, object> Result =
+                    new ResultFormatter(ApiVersion, General.CREATED_STATUS_CODE, General.OK_MESSAGE)
+                    .Ok();
+                return NoContent();
+            }
+            catch (Exception e)
+            {
+                Dictionary<string, object> Result =
+                    new ResultFormatter(ApiVersion, General.INTERNAL_ERROR_STATUS_CODE, e.Message)
+                    .Fail();
+                return StatusCode(General.INTERNAL_ERROR_STATUS_CODE, Result);
+            }
+        }
+
+        [HttpPut("reduce-qty-by-id/{_id}")]
+        public async Task<IActionResult> ReduceTotalQty([FromRoute] int _id, [FromBody] ItemViewModelUsername ViewModel)
+        {
+            try
+            {
+                Service.Username = ViewModel.Username;
+                Service.Token = ViewModel.Token;
+
+                await Service.ReduceTotalQtyAsync(_id, ViewModel.TotalQty, ViewModel.Username);
+
+                Dictionary<string, object> Result =
+                    new ResultFormatter(ApiVersion, General.CREATED_STATUS_CODE, General.OK_MESSAGE)
+                    .Ok();
+                return NoContent();
+            }
+            catch (Exception e)
+            {
+                Dictionary<string, object> Result =
+                    new ResultFormatter(ApiVersion, General.INTERNAL_ERROR_STATUS_CODE, e.Message)
+                    .Fail();
+                return StatusCode(General.INTERNAL_ERROR_STATUS_CODE, Result);
+            }
+        }
     }
 }

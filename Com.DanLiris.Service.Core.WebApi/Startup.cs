@@ -103,6 +103,7 @@ namespace Com.DanLiris.Service.Core.WebApi
                 .AddTransient<IMachineSpinningService, MachineSpinningService>()
                 .AddScoped<RolesService>()
                 .AddScoped<SizeService>()
+                .AddScoped<MasterSourceService>()
                 .AddTransient<ArticleCategoryService>()
                 .AddTransient<ArticleMaterialService>()
                 .AddTransient<ArticleProcesService>()
@@ -119,7 +120,8 @@ namespace Com.DanLiris.Service.Core.WebApi
                 .AddTransient<IAzureImageService, AzureImageService>()
                 .AddTransient<StoreService>()
                 .AddTransient<BankService>()
-                .AddTransient<ModuleService>();
+                .AddTransient<ModuleService>()
+                .AddTransient<MasterSourceService>();
 
 
             RegisterServices(services);

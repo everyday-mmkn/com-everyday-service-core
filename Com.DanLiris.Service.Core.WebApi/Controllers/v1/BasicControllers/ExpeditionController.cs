@@ -14,7 +14,7 @@ namespace Com.DanLiris.Service.Core.WebApi.Controllers.v1.BasicControllers
     [Produces("application/json")]
     [ApiVersion("1.0")]
     [Route("v{version:apiVersion}/expedition-service-routers/all")]
-    public class ExpeditionController : BasicController<ExpeditionService, Expedition, ExpeditionViewModel, CoreDbContext>
+    public class ExpeditionController : BasicController<ExpeditionService, MasterExpedition, ExpeditionViewModel, CoreDbContext>
     {
         //private readonly ExpeditionService service;
         private new static readonly string ApiVersion = "1.0";
