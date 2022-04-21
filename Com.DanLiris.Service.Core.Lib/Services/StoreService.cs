@@ -58,8 +58,8 @@ namespace Com.DanLiris.Service.Core.Lib.Services
                     OnlineOffline = b.OnlineOffline,
                     Status = b.Status,
                     SalesCategory = b.SalesCategory,
-                    Longitude = b.Longitude,
-                    Latitude = b.Latitude,
+                    //Longitude = b.Longitude,
+                    //Latitude = b.Latitude,
                     Pic = b.Pic,
                     Phone = b.Phone
                 });
@@ -124,8 +124,8 @@ namespace Com.DanLiris.Service.Core.Lib.Services
             seasonVM.storeArea = season.StoreArea;
             seasonVM.storeCategory = season.StoreCategory;
             seasonVM.storeWide = season.StoreWide;
-            seasonVM.longitude = season.Longitude;
-            seasonVM.latitude = season.Latitude;
+            //seasonVM.longitude = season.Longitude;
+            //seasonVM.latitude = season.Latitude;
 
             return seasonVM;
         }
@@ -162,8 +162,8 @@ namespace Com.DanLiris.Service.Core.Lib.Services
             season.StoreArea = seasonVM.storeArea;
             season.StoreCategory = seasonVM.storeCategory;
             season.StoreWide = seasonVM.storeWide;
-            season.Longitude = seasonVM.longitude;
-            season.Latitude = seasonVM.latitude;
+            //season.Longitude = seasonVM.longitude;
+            //season.Latitude = seasonVM.latitude;
 
             return season;
         }
