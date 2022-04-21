@@ -11,9 +11,10 @@ using System;
 namespace Com.DanLiris.Service.Core.Lib.Migrations
 {
     [DbContext(typeof(CoreDbContext))]
-    partial class CoreDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220420084749_changeName_Stores")]
+    partial class changeName_Stores
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -3647,6 +3648,10 @@ namespace Com.DanLiris.Service.Core.Lib.Migrations
 
                     b.Property<string>("Description")
                         .HasMaxLength(255);
+
+                    b.Property<float>("Latitude");
+
+                    b.Property<float>("Longitude");
 
                     b.Property<float>("MonthlyTotalCost");
 
