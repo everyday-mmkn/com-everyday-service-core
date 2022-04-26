@@ -11,8 +11,8 @@ using System;
 namespace Com.DanLiris.Service.Core.Lib.Migrations
 {
     [DbContext(typeof(CoreDbContext))]
-    [Migration("20210812090639_AddTableMasterSources")]
-    partial class AddTableMasterSources
+    [Migration("20220422063548_delete_accountProfiles_Permissions_Roles")]
+    partial class delete_accountProfiles_Permissions_Roles
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -20,194 +20,6 @@ namespace Com.DanLiris.Service.Core.Lib.Migrations
             modelBuilder
                 .HasAnnotation("ProductVersion", "2.0.0-rtm-26452")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-            modelBuilder.Entity("Com.DanLiris.Service.Core.Lib.Models.Account_and_Roles.AccountProfile", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<int>("AccountId");
-
-                    b.Property<string>("Firstname");
-
-                    b.Property<string>("Gender");
-
-                    b.Property<string>("Lastname");
-
-                    b.Property<string>("UId")
-                        .HasMaxLength(255);
-
-                    b.HasKey("Id");
-
-                    b.ToTable("AccountProfiles");
-                });
-
-            modelBuilder.Entity("Com.DanLiris.Service.Core.Lib.Models.Account_and_Roles.AccountRole", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<int>("AccountId");
-
-                    b.Property<bool>("Active");
-
-                    b.Property<int>("RoleId");
-
-                    b.Property<string>("UId")
-                        .HasMaxLength(255);
-
-                    b.Property<string>("_CreatedAgent")
-                        .IsRequired()
-                        .HasMaxLength(255);
-
-                    b.Property<string>("_CreatedBy")
-                        .IsRequired()
-                        .HasMaxLength(255);
-
-                    b.Property<DateTime>("_CreatedUtc");
-
-                    b.Property<string>("_DeletedAgent")
-                        .IsRequired()
-                        .HasMaxLength(255);
-
-                    b.Property<string>("_DeletedBy")
-                        .IsRequired()
-                        .HasMaxLength(255);
-
-                    b.Property<DateTime>("_DeletedUtc");
-
-                    b.Property<bool>("_IsDeleted");
-
-                    b.Property<string>("_LastModifiedAgent")
-                        .IsRequired()
-                        .HasMaxLength(255);
-
-                    b.Property<string>("_LastModifiedBy")
-                        .IsRequired()
-                        .HasMaxLength(255);
-
-                    b.Property<DateTime>("_LastModifiedUtc");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("RoleId");
-
-                    b.ToTable("AccountRoles");
-                });
-
-            modelBuilder.Entity("Com.DanLiris.Service.Core.Lib.Models.Account_and_Roles.Permission", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<bool>("Active");
-
-                    b.Property<string>("Division");
-
-                    b.Property<int>("RoleId");
-
-                    b.Property<string>("UId")
-                        .HasMaxLength(255);
-
-                    b.Property<string>("Unit");
-
-                    b.Property<string>("UnitCode");
-
-                    b.Property<int>("UnitId");
-
-                    b.Property<string>("_CreatedAgent")
-                        .IsRequired()
-                        .HasMaxLength(255);
-
-                    b.Property<string>("_CreatedBy")
-                        .IsRequired()
-                        .HasMaxLength(255);
-
-                    b.Property<DateTime>("_CreatedUtc");
-
-                    b.Property<string>("_DeletedAgent")
-                        .IsRequired()
-                        .HasMaxLength(255);
-
-                    b.Property<string>("_DeletedBy")
-                        .IsRequired()
-                        .HasMaxLength(255);
-
-                    b.Property<DateTime>("_DeletedUtc");
-
-                    b.Property<bool>("_IsDeleted");
-
-                    b.Property<string>("_LastModifiedAgent")
-                        .IsRequired()
-                        .HasMaxLength(255);
-
-                    b.Property<string>("_LastModifiedBy")
-                        .IsRequired()
-                        .HasMaxLength(255);
-
-                    b.Property<DateTime>("_LastModifiedUtc");
-
-                    b.Property<int>("permission");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("RoleId");
-
-                    b.ToTable("Permissions");
-                });
-
-            modelBuilder.Entity("Com.DanLiris.Service.Core.Lib.Models.Account_and_Roles.Role", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<bool>("Active");
-
-                    b.Property<string>("Code");
-
-                    b.Property<string>("Description");
-
-                    b.Property<string>("Name");
-
-                    b.Property<string>("UId")
-                        .HasMaxLength(255);
-
-                    b.Property<string>("_CreatedAgent")
-                        .IsRequired()
-                        .HasMaxLength(255);
-
-                    b.Property<string>("_CreatedBy")
-                        .IsRequired()
-                        .HasMaxLength(255);
-
-                    b.Property<DateTime>("_CreatedUtc");
-
-                    b.Property<string>("_DeletedAgent")
-                        .IsRequired()
-                        .HasMaxLength(255);
-
-                    b.Property<string>("_DeletedBy")
-                        .IsRequired()
-                        .HasMaxLength(255);
-
-                    b.Property<DateTime>("_DeletedUtc");
-
-                    b.Property<bool>("_IsDeleted");
-
-                    b.Property<string>("_LastModifiedAgent")
-                        .IsRequired()
-                        .HasMaxLength(255);
-
-                    b.Property<string>("_LastModifiedBy")
-                        .IsRequired()
-                        .HasMaxLength(255);
-
-                    b.Property<DateTime>("_LastModifiedUtc");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Roles");
-                });
 
             modelBuilder.Entity("Com.DanLiris.Service.Core.Lib.Models.AccountBank", b =>
                 {
@@ -1694,62 +1506,6 @@ namespace Com.DanLiris.Service.Core.Lib.Migrations
                     b.ToTable("Divisions");
                 });
 
-            modelBuilder.Entity("Com.DanLiris.Service.Core.Lib.Models.Expedition", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<bool>("Active");
-
-                    b.Property<string>("Code")
-                        .HasMaxLength(255);
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(255);
-
-                    b.Property<string>("Name")
-                        .HasMaxLength(255);
-
-                    b.Property<string>("UId")
-                        .HasMaxLength(255);
-
-                    b.Property<string>("_CreatedAgent")
-                        .IsRequired()
-                        .HasMaxLength(255);
-
-                    b.Property<string>("_CreatedBy")
-                        .IsRequired()
-                        .HasMaxLength(255);
-
-                    b.Property<DateTime>("_CreatedUtc");
-
-                    b.Property<string>("_DeletedAgent")
-                        .IsRequired()
-                        .HasMaxLength(255);
-
-                    b.Property<string>("_DeletedBy")
-                        .IsRequired()
-                        .HasMaxLength(255);
-
-                    b.Property<DateTime>("_DeletedUtc");
-
-                    b.Property<bool>("_IsDeleted");
-
-                    b.Property<string>("_LastModifiedAgent")
-                        .IsRequired()
-                        .HasMaxLength(255);
-
-                    b.Property<string>("_LastModifiedBy")
-                        .IsRequired()
-                        .HasMaxLength(255);
-
-                    b.Property<DateTime>("_LastModifiedUtc");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Expeditions");
-                });
-
             modelBuilder.Entity("Com.DanLiris.Service.Core.Lib.Models.FinishType", b =>
                 {
                     b.Property<int>("Id")
@@ -2787,6 +2543,62 @@ namespace Com.DanLiris.Service.Core.Lib.Migrations
                     b.ToTable("MappingCategories");
                 });
 
+            modelBuilder.Entity("Com.DanLiris.Service.Core.Lib.Models.MasterExpedition", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<bool>("Active");
+
+                    b.Property<string>("Code")
+                        .HasMaxLength(255);
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(255);
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(255);
+
+                    b.Property<string>("UId")
+                        .HasMaxLength(255);
+
+                    b.Property<string>("_CreatedAgent")
+                        .IsRequired()
+                        .HasMaxLength(255);
+
+                    b.Property<string>("_CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(255);
+
+                    b.Property<DateTime>("_CreatedUtc");
+
+                    b.Property<string>("_DeletedAgent")
+                        .IsRequired()
+                        .HasMaxLength(255);
+
+                    b.Property<string>("_DeletedBy")
+                        .IsRequired()
+                        .HasMaxLength(255);
+
+                    b.Property<DateTime>("_DeletedUtc");
+
+                    b.Property<bool>("_IsDeleted");
+
+                    b.Property<string>("_LastModifiedAgent")
+                        .IsRequired()
+                        .HasMaxLength(255);
+
+                    b.Property<string>("_LastModifiedBy")
+                        .IsRequired()
+                        .HasMaxLength(255);
+
+                    b.Property<DateTime>("_LastModifiedUtc");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("MasterExpeditions");
+                });
+
             modelBuilder.Entity("Com.DanLiris.Service.Core.Lib.Models.MasterSource", b =>
                 {
                     b.Property<int>("Id")
@@ -2838,6 +2650,106 @@ namespace Com.DanLiris.Service.Core.Lib.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("MasterSources");
+                });
+
+            modelBuilder.Entity("Com.DanLiris.Service.Core.Lib.Models.MasterStore", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<bool>("Active");
+
+                    b.Property<string>("Address")
+                        .HasMaxLength(255);
+
+                    b.Property<string>("City")
+                        .HasMaxLength(255);
+
+                    b.Property<DateTimeOffset>("ClosedDate");
+
+                    b.Property<string>("Code")
+                        .HasMaxLength(255);
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(255);
+
+                    b.Property<float>("Latitude");
+
+                    b.Property<float>("Longitude");
+
+                    b.Property<float>("MonthlyTotalCost");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(255);
+
+                    b.Property<string>("OnlineOffline")
+                        .HasMaxLength(255);
+
+                    b.Property<DateTimeOffset>("OpenedDate");
+
+                    b.Property<string>("Phone")
+                        .HasMaxLength(255);
+
+                    b.Property<string>("Pic")
+                        .HasMaxLength(255);
+
+                    b.Property<float>("SalesCapital");
+
+                    b.Property<string>("SalesCategory")
+                        .HasMaxLength(255);
+
+                    b.Property<float>("SalesTarget");
+
+                    b.Property<string>("Status")
+                        .HasMaxLength(255);
+
+                    b.Property<string>("StoreArea")
+                        .HasMaxLength(255);
+
+                    b.Property<string>("StoreCategory")
+                        .HasMaxLength(255);
+
+                    b.Property<string>("StoreWide")
+                        .HasMaxLength(255);
+
+                    b.Property<string>("Uid")
+                        .HasMaxLength(255);
+
+                    b.Property<string>("_CreatedAgent")
+                        .IsRequired()
+                        .HasMaxLength(255);
+
+                    b.Property<string>("_CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(255);
+
+                    b.Property<DateTime>("_CreatedUtc");
+
+                    b.Property<string>("_DeletedAgent")
+                        .IsRequired()
+                        .HasMaxLength(255);
+
+                    b.Property<string>("_DeletedBy")
+                        .IsRequired()
+                        .HasMaxLength(255);
+
+                    b.Property<DateTime>("_DeletedUtc");
+
+                    b.Property<bool>("_IsDeleted");
+
+                    b.Property<string>("_LastModifiedAgent")
+                        .IsRequired()
+                        .HasMaxLength(255);
+
+                    b.Property<string>("_LastModifiedBy")
+                        .IsRequired()
+                        .HasMaxLength(255);
+
+                    b.Property<DateTime>("_LastModifiedUtc");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("MasterStores");
                 });
 
             modelBuilder.Entity("Com.DanLiris.Service.Core.Lib.Models.MaterialConstruction", b =>
@@ -3628,106 +3540,6 @@ namespace Com.DanLiris.Service.Core.Lib.Migrations
                     b.ToTable("Storages");
                 });
 
-            modelBuilder.Entity("Com.DanLiris.Service.Core.Lib.Models.Store", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<bool>("Active");
-
-                    b.Property<string>("Address")
-                        .HasMaxLength(255);
-
-                    b.Property<string>("City")
-                        .HasMaxLength(255);
-
-                    b.Property<DateTimeOffset>("ClosedDate");
-
-                    b.Property<string>("Code")
-                        .HasMaxLength(255);
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(255);
-
-                    b.Property<float>("Latitude");
-
-                    b.Property<float>("Longitude");
-
-                    b.Property<float>("MonthlyTotalCost");
-
-                    b.Property<string>("Name")
-                        .HasMaxLength(255);
-
-                    b.Property<string>("OnlineOffline")
-                        .HasMaxLength(255);
-
-                    b.Property<DateTimeOffset>("OpenedDate");
-
-                    b.Property<string>("Phone")
-                        .HasMaxLength(255);
-
-                    b.Property<string>("Pic")
-                        .HasMaxLength(255);
-
-                    b.Property<float>("SalesCapital");
-
-                    b.Property<string>("SalesCategory")
-                        .HasMaxLength(255);
-
-                    b.Property<float>("SalesTarget");
-
-                    b.Property<string>("Status")
-                        .HasMaxLength(255);
-
-                    b.Property<string>("StoreArea")
-                        .HasMaxLength(255);
-
-                    b.Property<string>("StoreCategory")
-                        .HasMaxLength(255);
-
-                    b.Property<string>("StoreWide")
-                        .HasMaxLength(255);
-
-                    b.Property<string>("Uid")
-                        .HasMaxLength(255);
-
-                    b.Property<string>("_CreatedAgent")
-                        .IsRequired()
-                        .HasMaxLength(255);
-
-                    b.Property<string>("_CreatedBy")
-                        .IsRequired()
-                        .HasMaxLength(255);
-
-                    b.Property<DateTime>("_CreatedUtc");
-
-                    b.Property<string>("_DeletedAgent")
-                        .IsRequired()
-                        .HasMaxLength(255);
-
-                    b.Property<string>("_DeletedBy")
-                        .IsRequired()
-                        .HasMaxLength(255);
-
-                    b.Property<DateTime>("_DeletedUtc");
-
-                    b.Property<bool>("_IsDeleted");
-
-                    b.Property<string>("_LastModifiedAgent")
-                        .IsRequired()
-                        .HasMaxLength(255);
-
-                    b.Property<string>("_LastModifiedBy")
-                        .IsRequired()
-                        .HasMaxLength(255);
-
-                    b.Property<DateTime>("_LastModifiedUtc");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Stores");
-                });
-
             modelBuilder.Entity("Com.DanLiris.Service.Core.Lib.Models.Supplier", b =>
                 {
                     b.Property<int>("Id")
@@ -4020,22 +3832,6 @@ namespace Com.DanLiris.Service.Core.Lib.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("YarnMaterials");
-                });
-
-            modelBuilder.Entity("Com.DanLiris.Service.Core.Lib.Models.Account_and_Roles.AccountRole", b =>
-                {
-                    b.HasOne("Com.DanLiris.Service.Core.Lib.Models.Account_and_Roles.Role", "Role")
-                        .WithMany("AccountRoles")
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade);
-                });
-
-            modelBuilder.Entity("Com.DanLiris.Service.Core.Lib.Models.Account_and_Roles.Permission", b =>
-                {
-                    b.HasOne("Com.DanLiris.Service.Core.Lib.Models.Account_and_Roles.Role", "Role")
-                        .WithMany("Permissions")
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("Com.DanLiris.Service.Core.Lib.Models.MachineSpinningProcessType", b =>

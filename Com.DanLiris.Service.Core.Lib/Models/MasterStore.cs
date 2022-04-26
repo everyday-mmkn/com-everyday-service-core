@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Com.DanLiris.Service.Core.Lib.Models
 {
-    public class Store : StandardEntity, IValidatableObject
+    public class MasterStore : StandardEntity, IValidatableObject
     {
         [StringLength(255)]
         public string Address { get; set; }
@@ -39,8 +39,8 @@ namespace Com.DanLiris.Service.Core.Lib.Models
         public string StoreCategory { get; set; }
         [StringLength(255)]
         public string StoreWide { get; set; }
-        //public float Longitude { get; set; }
-        //public float Latitude { get; set; }
+        public float Longitude { get; set; }
+        public float Latitude { get; set; }
 
 
         [StringLength(255)]

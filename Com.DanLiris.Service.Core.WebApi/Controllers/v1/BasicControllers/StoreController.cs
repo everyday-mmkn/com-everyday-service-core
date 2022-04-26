@@ -14,7 +14,7 @@ namespace Com.DanLiris.Service.Core.WebApi.Controllers.v1.BasicControllers
     [Produces("application/json")]
     [ApiVersion("1.0")]
     [Route("v{version:apiVersion}/master/stores")]
-    public class StoreController : BasicController<StoreService, Store, StoreViewModel, CoreDbContext>
+    public class StoreController : BasicController<StoreService, MasterStore, StoreViewModel, CoreDbContext>
     {
         private new static readonly string ApiVersion = "1.0";
         StoreService service;
@@ -30,7 +30,7 @@ namespace Com.DanLiris.Service.Core.WebApi.Controllers.v1.BasicControllers
 
                 // service.Username = User.Claims.Single(p => p.Type.Equals("username")).Value;
 
-                List<Store> Data = await service.GetStoreByCategory(category);
+                List<MasterStore> Data = await service.GetStoreByCategory(category);
 
 
 
@@ -57,7 +57,7 @@ namespace Com.DanLiris.Service.Core.WebApi.Controllers.v1.BasicControllers
 
                 // service.Username = User.Claims.Single(p => p.Type.Equals("username")).Value;
 
-                Store Data = await service.GetStoreByCode(code);
+                MasterStore Data = await service.GetStoreByCode(code);
 
 
 
