@@ -16,15 +16,15 @@ using System.Threading.Tasks;
 
 namespace Com.DanLiris.Service.Core.Lib.Services
 {
-    public class StoreService : BasicService<CoreDbContext, Store>, IMap<Store, StoreViewModel>
+    public class StoreService : BasicService<CoreDbContext, MasterStore>, IMap<MasterStore, StoreViewModel>
     {
         public StoreService(IServiceProvider serviceProvider) : base(serviceProvider)
         {
         }
 
-        public override Tuple<List<Store>, int, Dictionary<string, string>, List<string>> ReadModel(int Page = 1, int Size = 25, string Order = "{}", List<string> Select = null, string Keyword = null, string Filter = "{}")
+        public override Tuple<List<MasterStore>, int, Dictionary<string, string>, List<string>> ReadModel(int Page = 1, int Size = 25, string Order = "{}", List<string> Select = null, string Keyword = null, string Filter = "{}")
         {
-            IQueryable<Store> Query = this.DbContext.Stores;
+            IQueryable<MasterStore> Query = this.DbContext.MasterStores;
             Dictionary<string, object> FilterDictionary = JsonConvert.DeserializeObject<Dictionary<string, object>>(Filter);
             Query = ConfigureFilter(Query, FilterDictionary);
             Dictionary<string, string> OrderDictionary = JsonConvert.DeserializeObject<Dictionary<string, string>>(Order);
@@ -48,7 +48,7 @@ namespace Com.DanLiris.Service.Core.Lib.Services
             };
 
             Query = Query
-                .Select(b => new Store
+                .Select(b => new MasterStore
                 {
                     Id = b.Id,
                     Code = b.Code,
@@ -85,14 +85,14 @@ namespace Com.DanLiris.Service.Core.Lib.Services
             }
 
             /* Pagination */
-            Pageable<Store> pageable = new Pageable<Store>(Query, Page - 1, Size);
-            List<Store> Data = pageable.Data.ToList<Store>();
+            Pageable<MasterStore> pageable = new Pageable<MasterStore>(Query, Page - 1, Size);
+            List<MasterStore> Data = pageable.Data.ToList<MasterStore>();
 
             int TotalData = pageable.TotalCount;
 
             return Tuple.Create(Data, TotalData, OrderDictionary, SelectedFields);
         }
-        public StoreViewModel MapToViewModel(Store season)
+        public StoreViewModel MapToViewModel(MasterStore season)
         {
             StoreViewModel seasonVM = new StoreViewModel();
 
@@ -130,9 +130,9 @@ namespace Com.DanLiris.Service.Core.Lib.Services
             return seasonVM;
         }
 
-        public Store MapToModel(StoreViewModel seasonVM)
+        public MasterStore MapToModel(StoreViewModel seasonVM)
         {
-            Store season = new Store();
+            MasterStore season = new MasterStore();
 
             season.Id = seasonVM.Id;
             season.Uid = seasonVM.UId;
@@ -177,18 +177,18 @@ namespace Com.DanLiris.Service.Core.Lib.Services
             }
         }
 
-        public Task<List<Store>> GetStoreByCategory(string category)
+        public Task<List<MasterStore>> GetStoreByCategory(string category)
         {
-            var store = (from a in DbContext.Stores
+            var store = (from a in DbContext.MasterStores
                          where a.StoreCategory.Contains((string.IsNullOrWhiteSpace(category) ? a.StoreCategory : category))
                          select a).ToListAsync();
             return store;
         }
 
 
-        public Task<Store> GetStoreByCode(string code)
+        public Task<MasterStore> GetStoreByCode(string code)
         {
-            var store = (from a in DbContext.Stores
+            var store = (from a in DbContext.MasterStores
                          where a.Code.Contains((string.IsNullOrWhiteSpace(code) ? a.Code : code))
                          select a).FirstOrDefaultAsync();
             return store;
@@ -196,7 +196,7 @@ namespace Com.DanLiris.Service.Core.Lib.Services
 
         public Task<StoreStorageViewModel> GetStoreStorageByCode(string code)
         {
-            var store = (from a in DbContext.Stores
+            var store = (from a in DbContext.MasterStores
                          join b in DbContext.Storages on a.Code equals b.Code
                          where a.Code.Contains((string.IsNullOrWhiteSpace(code) ? a.Code : code))
                          select new StoreStorageViewModel

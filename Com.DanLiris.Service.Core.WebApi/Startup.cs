@@ -5,7 +5,7 @@ using Com.DanLiris.Service.Core.Lib.Helpers.ValidateService;
 using Com.DanLiris.Service.Core.Lib.Interfaces;
 
 using Com.DanLiris.Service.Core.Lib.Services;
-using Com.DanLiris.Service.Core.Lib.Services.Account_and_Roles;
+//using Com.DanLiris.Service.Core.Lib.Services.Account_and_Roles;
 using Com.DanLiris.Service.Core.Lib.Services.MachineSpinning;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -89,10 +89,10 @@ namespace Com.DanLiris.Service.Core.WebApi
                 .AddScoped<FinishTypeService>()
                 .AddScoped<StandardTestsService>()
                 .AddScoped<LampStandardService>()
-                .AddScoped<PermissionService>()
+                //.AddScoped<PermissionService>()
                 .AddTransient<CardTypeService>()
                 .AddScoped<ColorTypeService>()
-                .AddScoped<RolesService>()
+                //.AddScoped<RolesService>()
                 .AddScoped<GarmentProductService>()
                 .AddScoped<GarmentCategoryService>()
                 .AddScoped<GarmentSupplierService>()
@@ -101,7 +101,7 @@ namespace Com.DanLiris.Service.Core.WebApi
                 .AddScoped<GarmentSectionService>()
                 .AddScoped<StandardMinuteValueService>()
                 .AddTransient<IMachineSpinningService, MachineSpinningService>()
-                .AddScoped<RolesService>()
+                //.AddScoped<RolesService>()
                 .AddScoped<SizeService>()
                 .AddScoped<MasterSourceService>()
                 .AddTransient<ArticleCategoryService>()
