@@ -121,7 +121,7 @@ namespace Com.DanLiris.Service.Core.Lib.Services
             expedition._LastModifiedAgent = expeditionVM._updateAgent;
             expedition.Code = expeditionVM.code;
             expedition.Description = expeditionVM.description;
-            expedition.Name = expedition.Name;
+            expedition.Name = expeditionVM.name;
 
             return expedition;
         }
