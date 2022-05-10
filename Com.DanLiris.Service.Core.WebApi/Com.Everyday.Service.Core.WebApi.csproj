@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Com.DanLiris.Service.Core.Lib\Com.DanLiris.Service.Core.Lib.csproj" />
+    <ProjectReference Include="..\Com.DanLiris.Service.Core.Lib\Com.Everyday.Service.Core.Lib.csproj" />
   </ItemGroup>
 
 </Project>
