@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
@@ -19,8 +19,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Com.DanLiris.Service.Core.Lib\Com.Everyday.Service.Core.Lib.csproj" />
-    <ProjectReference Include="..\Com.DanLiris.Service.Core.WebApi\Com.Everyday.Service.Core.WebApi.csproj" />
+    <ProjectReference Include="..\Com.Everyday.Service.Core.Lib\Com.Everyday.Service.Core.Lib.csproj" />
+    <ProjectReference Include="..\Com.Everyday.Service.Core.WebApi\Com.Everyday.Service.Core.WebApi.csproj" />
   </ItemGroup>
 
 </Project>

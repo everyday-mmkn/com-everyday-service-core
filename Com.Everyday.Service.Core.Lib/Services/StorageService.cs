@@ -209,7 +209,8 @@ namespace Com.DanLiris.Service.Core.Lib.Services
 
             var ModuleSources = (from a in DbContext.Modules
                            join b in DbContext.ModuleSources on a.Id equals b.ModuleId
-                           join c in DbContext.Storages on b.SourceValue equals storageVM.UId
+                           join c in DbContext.Storages on b.StorageId equals c.Id
+                           where b.SourceValue == storageVM.UId
                            select new ModuleSourceViewModel
                            {
                                _id=b.Id,
@@ -223,7 +224,8 @@ namespace Com.DanLiris.Service.Core.Lib.Services
             storageVM.moduleSources = ModuleSources.ToList();
             var ModuleDestinations = (from a in DbContext.Modules
                                  join b in DbContext.ModuleDestinations on a.Id equals b.ModuleId
-                                 join c in DbContext.Storages on b.DestinationValue equals storageVM.UId
+                                 join c in DbContext.Storages on b.StorageId equals c.Id
+                                 where b.DestinationValue == storageVM.UId
                                  select new ModuleDestinationViewModel
                                  {
                                      _id=b.Id,
