@@ -11,6 +11,8 @@ using Com.DanLiris.Service.Core.Lib.ViewModels;
 using Com.DanLiris.Service.Core.Lib.Interfaces;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Com.DanLiris.Service.Core.Lib.ViewModels.Module;
+using Com.DanLiris.Service.Core.Lib.Models.Module;
 
 namespace Com.DanLiris.Service.Core.Lib.Services
 {
@@ -51,7 +53,8 @@ namespace Com.DanLiris.Service.Core.Lib.Services
                     Code = s.Code,
                     Name = s.Name,
                     UnitName = s.UnitName,
-                    DivisionName = s.DivisionName
+                    DivisionName = s.DivisionName,
+                    Description=s.Description
                 });
 
             /* Order */
@@ -200,6 +203,38 @@ namespace Com.DanLiris.Service.Core.Lib.Services
             storageVM.unit._id = storage.UnitId;
             storageVM.unit.name = storage.UnitName;
             storageVM.unit.division.Name = storage.DivisionName;
+            storageVM.code = storage.Code;
+            storageVM.address = storage.Address;
+            storageVM.phone = storage.Phone;
+
+            var ModuleSources = (from a in DbContext.Modules
+                           join b in DbContext.ModuleSources on a.Id equals b.ModuleId
+                           join c in DbContext.Storages on b.SourceValue equals storageVM.UId
+                           select new ModuleSourceViewModel
+                           {
+                               _id=b.Id,
+                               moduleSource=new ModuleViewModel
+                               {
+                                   Name = a.Name,
+                                   Code = a.Code,
+                                   _id = a.Id
+                               }
+                           });
+            storageVM.moduleSources = ModuleSources.ToList();
+            var ModuleDestinations = (from a in DbContext.Modules
+                                 join b in DbContext.ModuleDestinations on a.Id equals b.ModuleId
+                                 join c in DbContext.Storages on b.DestinationValue equals storageVM.UId
+                                 select new ModuleDestinationViewModel
+                                 {
+                                     _id=b.Id,
+                                     moduleDestination= new ModuleViewModel
+                                     {
+                                         Name = a.Name,
+                                         Code = a.Code,
+                                         _id = a.Id
+                                     }
+                                 });
+            storageVM.moduleDestinations = ModuleDestinations.ToList();
 
             return storageVM;
         }
@@ -209,7 +244,7 @@ namespace Com.DanLiris.Service.Core.Lib.Services
             Storage storage = new Storage();
 
             storage.Id = storageVM._id;
-            storage.UId = storageVM.UId;
+            storage.UId = storageVM.code;
             storage._IsDeleted = storageVM._deleted;
             storage.Active = storageVM._active;
             storage._CreatedUtc = storageVM._createdDate;
@@ -221,6 +256,8 @@ namespace Com.DanLiris.Service.Core.Lib.Services
             storage.Code = storageVM.code;
             storage.Name = storageVM.name;
             storage.Description = storageVM.description;
+            storage.Address = storageVM.address;
+            storage.Phone = storageVM.phone;
 
             if (!Equals(storageVM.unit, null))
             {
@@ -235,21 +272,53 @@ namespace Com.DanLiris.Service.Core.Lib.Services
                 storage.DivisionName = null;
             }
 
+            storage.ModuleSources = new List<ModuleSource>();
+            if (storageVM.moduleSources!=null || storageVM.moduleSources.Count != 0)
+            {
+                foreach (var s in storageVM.moduleSources)
+                {
+                    ModuleSource ms = new ModuleSource
+                    {
+                        Id=s._id,
+                        ModuleId = s.moduleSource._id,
+                        SourceValue = storage.Code
+                    };
+                    storage.ModuleSources.Add(ms);
+                }
+            }
+
+            storage.ModuleDestinations = new List<ModuleDestination>();
+            if (storageVM.moduleDestinations != null || storageVM.moduleDestinations.Count != 0)
+            {
+                foreach (var d in storageVM.moduleDestinations)
+                {
+                    ModuleDestination md = new ModuleDestination
+                    {
+                        Id=d._id,
+                        ModuleId = d.moduleDestination._id,
+                        DestinationValue = storage.Code
+                    };
+                    storage.ModuleDestinations.Add(md);
+                }
+            }
+                
+
             return storage;
         }
 
         public override void OnCreating(Storage model)
         {
-            CodeGenerator codeGenerator = new CodeGenerator();
+            //CodeGenerator codeGenerator = new CodeGenerator();
 
-            do
-            {
-                model.Code = codeGenerator.GenerateCode();
-            }
-            while (this.DbSet.Any(d => d.Code.Equals(model.Code)));
+            //do
+            //{
+            //    model.Code = codeGenerator.GenerateCode();
+            //}
+            //while (this.DbSet.Any(d => d.Code.Equals(model.Code)));
 
             base.OnCreating(model);
         }
+
 
         public Task<List<StorageByNameViewModel>> GetStorageByName(string keyword, int page, int size)
         {
@@ -294,5 +363,73 @@ namespace Com.DanLiris.Service.Core.Lib.Services
             return storage;
         }
 
+
+        public override async Task<int> UpdateModel(int Id, Storage Model)
+        {
+            int Updated = 0;
+
+            using (var transaction = DbContext.Database.BeginTransaction())
+            {
+                try
+                {
+                    var oldM = this.DbSet
+                        .Include(d => d.ModuleSources)
+                        .Include(d=>d.ModuleDestinations)
+                        .SingleOrDefault(s => s.Id == Id);
+
+                    if (oldM != null && oldM.Id == Id)
+                    {
+                        foreach (var oldSource in oldM.ModuleSources)
+                        {
+                            var newItem = Model.ModuleSources.FirstOrDefault(i => i.Id.Equals(oldSource.Id));
+                            if (newItem == null)
+                            {
+                                oldSource._IsDeleted = true;
+                                oldSource._DeletedUtc = DateTime.Now;
+                                oldSource._DeletedBy = Model._LastModifiedBy;
+                                oldSource._DeletedAgent = Model._LastModifiedAgent;
+                            }
+                        }
+
+                        foreach (var item in Model.ModuleSources.Where(i => i.Id == 0))
+                        {
+                            oldM.ModuleSources.Add(item);
+                        }
+
+                        foreach (var oldDestination in oldM.ModuleDestinations)
+                        {
+                            var newItem = Model.ModuleDestinations.FirstOrDefault(i => i.Id.Equals(oldDestination.Id));
+                            if (newItem == null)
+                            {
+                                oldDestination._IsDeleted = true;
+                                oldDestination._DeletedUtc = DateTime.Now;
+                                oldDestination._DeletedBy = Model._LastModifiedBy;
+                                oldDestination._DeletedAgent = Model._LastModifiedAgent;
+                            }
+                        }
+
+
+                        foreach (var item in Model.ModuleDestinations.Where(i => i.Id == 0))
+                        {
+                            oldM.ModuleDestinations.Add(item);
+                        }
+
+                        Updated = await DbContext.SaveChangesAsync();
+                        transaction.Commit();
+                    }
+                    else
+                    {
+                        throw new Exception("Invalid Id");
+                    }
+                }
+                catch (Exception e)
+                {
+                    transaction.Rollback();
+                    throw new Exception(e.Message);
+                }
+            }
+
+            return Updated;
+        }
     }
 }

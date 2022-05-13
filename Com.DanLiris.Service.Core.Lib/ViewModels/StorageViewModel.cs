@@ -1,5 +1,7 @@
 ﻿using Com.DanLiris.Service.Core.Lib.Helpers;
+using Com.DanLiris.Service.Core.Lib.ViewModels.Module;
 using System;
+using System.Collections.Generic;
 
 namespace Com.DanLiris.Service.Core.Lib.ViewModels
 {
@@ -18,6 +20,9 @@ namespace Com.DanLiris.Service.Core.Lib.ViewModels
         public bool isCentral { get; set; }
 
         public StorageUnitViewModel unit { get; set; }
+
+        public List<ModuleSourceViewModel> moduleSources { get; set; }
+        public List<ModuleDestinationViewModel> moduleDestinations { get; set; }
     }
 
     public class StorageUnitViewModel
@@ -27,5 +32,15 @@ namespace Com.DanLiris.Service.Core.Lib.ViewModels
         public string name { get; set; }
 
         public DivisionViewModel division { get; set; }
+    }
+
+    public class ModuleSourceViewModel : BasicViewModelOld
+    {
+        public ModuleViewModel moduleSource { get; set; }
+    }
+
+    public class ModuleDestinationViewModel : BasicViewModelOld
+    {
+        public ModuleViewModel moduleDestination { get; set; }
     }
 }

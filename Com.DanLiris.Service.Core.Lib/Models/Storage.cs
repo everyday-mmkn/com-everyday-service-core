@@ -1,4 +1,5 @@
 ﻿using Com.DanLiris.Service.Core.Lib.Helpers;
+using Com.DanLiris.Service.Core.Lib.Models.Module;
 using Com.DanLiris.Service.Core.Lib.Services;
 using Com.Moonlay.Models;
 using System.Collections.Generic;
@@ -33,30 +34,86 @@ namespace Com.DanLiris.Service.Core.Lib.Models
         public string Phone { get; set; }
 
         public bool IsCentral { get; set; }
+        public virtual ICollection<ModuleSource> ModuleSources { get; set; }
+        public virtual ICollection<ModuleDestination> ModuleDestinations { get; set; }
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             List<ValidationResult> validationResult = new List<ValidationResult>();
+            if (string.IsNullOrWhiteSpace(this.Code))
+                yield return new ValidationResult("Kode tidak boleh kosong", new List<string> { "code" });
 
             if (string.IsNullOrWhiteSpace(this.Name))
-                validationResult.Add(new ValidationResult("Name is required", new List<string> { "name" }));
+                yield return new ValidationResult("Nama tidak boleh kosong", new List<string> { "name" });
 
             if (this.UnitId.Equals(null))
-                validationResult.Add(new ValidationResult("Unit is required", new List<string> { "unit" }));
+                yield return new ValidationResult("Unit tidak boleh kosong", new List<string> { "unit" });
 
-            if (validationResult.Count.Equals(0))
+            
+            /* Service Validation */
+            StorageService service = (StorageService)validationContext.GetService(typeof(StorageService));
+
+            if (service.DbContext.Set<Storage>().Count(r => r._IsDeleted.Equals(false) && r.Id != this.Id && r.Code.Equals(this.Code)  ) > 0)
             {
-                /* Service Validation */
-                StorageService service = (StorageService)validationContext.GetService(typeof(StorageService));
-
-                if (service.DbContext.Set<Storage>().Count(r => r._IsDeleted.Equals(false) && r.Id != this.Id && r.Name.Equals(this.Name) && r.UnitId.Equals(this.UnitId)) > 0)
-                {
-                    validationResult.Add(new ValidationResult("Name and Unit already exists", new List<string> { "name" }));
-                    validationResult.Add(new ValidationResult("Name and Unit already exists", new List<string> { "unit" }));
-                }     
+                yield return new ValidationResult("Kode sudah ada", new List<string> { "code" });
             }
 
-            return validationResult;
+            if ( ModuleSources==null && ModuleDestinations==null)
+            {
+                yield return new ValidationResult("silakan pilih module destination/source", new List<string> { "modules" });
+            }
+            else
+            {
+                if (ModuleSources.Count > 0)
+                {
+                    string sourceError = "[";
+                    int sourceErrorCount = 0;
+                    foreach (var s in ModuleSources)
+                    {
+                        sourceError += "{";
+
+                        if (s.ModuleId == 0)
+                        {
+                            sourceErrorCount++;
+                            sourceError += "moduleSource: 'nama module harus dipilih', ";
+                        }
+
+
+
+                        sourceError += "}, ";
+                    }
+
+                    sourceError += "]";
+
+                    if (sourceErrorCount > 0)
+                        yield return new ValidationResult(sourceError, new List<string> { "ModuleSources" });
+                }
+                else if (ModuleDestinations.Count > 0)
+                {
+                    string destinationError = "[";
+                    int destinationErrorCount = 0;
+                    foreach (var s in ModuleDestinations)
+                    {
+                        destinationError += "{";
+
+                        if (s.ModuleId == 0)
+                        {
+                            destinationErrorCount++;
+                            destinationError += "moduleSource: 'nama module harus dipilih', ";
+                        }
+                        destinationError += "}, ";
+                    }
+
+                    destinationError += "]";
+
+                    if (destinationErrorCount > 0)
+                        yield return new ValidationResult(destinationError, new List<string> { "ModuleDestinations" });
+                }
+            }
+
+            
+
+            //return validationResult;
         }
     }
 }

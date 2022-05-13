@@ -18,6 +18,9 @@ namespace Com.DanLiris.Service.Core.Lib.Models.Module
         public virtual int ModuleId { get; set; }
         [ForeignKey("ModuleId")]
         public virtual Module Module { get; set; }
+        public virtual int StorageId { get; set; }
+        [ForeignKey("StorageId")]
+        public virtual Storage Storage { get; set; }
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
