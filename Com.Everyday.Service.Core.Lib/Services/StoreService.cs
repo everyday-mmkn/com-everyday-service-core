@@ -61,7 +61,8 @@ namespace Com.DanLiris.Service.Core.Lib.Services
                     //Longitude = b.Longitude,
                     //Latitude = b.Latitude,
                     Pic = b.Pic,
-                    Phone = b.Phone
+                    Phone = b.Phone,
+                    City=b.City
                 });
 
             /* Order */
