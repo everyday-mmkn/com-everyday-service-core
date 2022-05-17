@@ -30,6 +30,9 @@ namespace Com.DanLiris.Service.Core.Test.DataUtils
             {
                 Name = string.Format("Unit {0}", guid),
                 Code = string.Format("Unit {0}", guid),
+                DivisionCode= string.Format("Unit {0}", guid),
+                DivisionName= string.Format("Unit {0}", guid),
+                DivisionId=1
             };
         }
 

@@ -1,139 +1,297 @@
-﻿using Com.DanLiris.Service.Core.Lib.Models;
+﻿using Com.DanLiris.Service.Core.Lib;
+using Com.DanLiris.Service.Core.Lib.Helpers.IdentityService;
+using Com.DanLiris.Service.Core.Lib.Helpers.ValidateService;
+using Com.DanLiris.Service.Core.Lib.Models;
 using Com.DanLiris.Service.Core.Lib.Services;
 using Com.DanLiris.Service.Core.Lib.ViewModels;
 using Com.DanLiris.Service.Core.Test.DataUtils;
+using Com.DanLiris.Service.Core.WebApi.Controllers.v1.BasicControllers;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.Extensions.DependencyInjection;
+using Moq;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Runtime.CompilerServices;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 
 namespace Com.DanLiris.Service.Core.Test.Controllers.UnitTest
 {
-    [Collection("TestFixture Collection")]
     public class UnitBasicTest
     {
-        private const string URI = "v1/master/units";
-
-        protected TestServerFixture TestFixture { get; set; }
-
-        protected HttpClient Client
+        protected UnitsController GetController(UnitService service)
         {
-            get { return this.TestFixture.Client; }
-        }
-
-        public UnitBasicTest(TestServerFixture fixture)
-        {
-            TestFixture = fixture;
-        }
-
-        protected UnitDataUtil DataUtil
-        {
-            get { return (UnitDataUtil)this.TestFixture.Service.GetService(typeof(UnitDataUtil)); }
-        }
-
-        protected UnitService Service
-        {
-            get { return (UnitService)this.TestFixture.Service.GetService(typeof(UnitService)); }
-        }
-
-
-        public UnitViewModel GenerateTestModel()
-        {
-            string guid = Guid.NewGuid().ToString();
-
-            return new UnitViewModel()
+            var user = new Mock<ClaimsPrincipal>();
+            var claims = new Claim[]
             {
-                Code = string.Format("TEST {0}", guid),
-                Name = string.Format("Unit {0}", guid),
-                Description = "Description",
-                Division = new DivisionViewModel
-                {
-                    Name = "DivisionName",
-                    Code= "DivisionCode",
-                    Id=1
-                },
+                new Claim("username", "unittestusername")
             };
+            user.Setup(u => u.Claims).Returns(claims);
+
+            UnitsController controller = new UnitsController(service);
+            controller.ControllerContext = new ControllerContext()
+            {
+                HttpContext = new DefaultHttpContext()
+                {
+                    User = user.Object
+                }
+            };
+            controller.ControllerContext.HttpContext.Request.Headers["Authorization"] = "Bearer unittesttoken";
+            controller.ControllerContext.HttpContext.Request.Path = new PathString("/v1/unit-test");
+            return controller;
+        }
+
+        private CoreDbContext _dbContext(string testName)
+        {
+            var serviceProvider = new ServiceCollection()
+              .AddEntityFrameworkInMemoryDatabase()
+              .BuildServiceProvider();
+
+            DbContextOptionsBuilder<CoreDbContext> optionsBuilder = new DbContextOptionsBuilder<CoreDbContext>();
+            optionsBuilder
+                .UseInMemoryDatabase(testName)
+                .ConfigureWarnings(w => w.Ignore(InMemoryEventId.TransactionIgnoredWarning))
+                .UseInternalServiceProvider(serviceProvider);
+
+            CoreDbContext dbContext = new CoreDbContext(optionsBuilder.Options);
+
+            return dbContext;
+        }
+
+        protected string GetCurrentAsyncMethod([CallerMemberName] string methodName = "")
+        {
+            var method = new StackTrace()
+                .GetFrames()
+                .Select(frame => frame.GetMethod())
+                .FirstOrDefault(item => item.Name == methodName);
+
+            return method.Name;
+
+        }
+
+        public Lib.Models.Unit GetTestData(CoreDbContext dbContext)
+        {
+            Lib.Models.Unit data = new Lib.Models.Unit();
+            dbContext.Units.Add(data);
+            dbContext.SaveChanges();
+
+            return data;
+        }
+
+        protected int GetStatusCode(IActionResult response)
+        {
+            return (int)response.GetType().GetProperty("StatusCode").GetValue(response, null);
+        }
+
+
+        Mock<IServiceProvider> GetServiceProvider()
+        {
+            Mock<IServiceProvider> serviceProvider = new Mock<IServiceProvider>();
+            serviceProvider
+              .Setup(s => s.GetService(typeof(IIdentityService)))
+              .Returns(new IdentityService() { TimezoneOffset = 1, Token = "token", Username = "username" });
+
+            var validateService = new Mock<IValidateService>();
+            serviceProvider
+              .Setup(s => s.GetService(typeof(IValidateService)))
+              .Returns(validateService.Object);
+            return serviceProvider;
         }
 
         [Fact]
-        public async Task Post()
+        public void Get_Return_OK()
         {
-            UnitViewModel VM = GenerateTestModel();
-            var response = await this.Client.PostAsync(URI, new StringContent(JsonConvert.SerializeObject(VM).ToString(), Encoding.UTF8, "application/json"));
+            //Setup
+            CoreDbContext dbContext = _dbContext(GetCurrentAsyncMethod());
+            Mock<IServiceProvider> serviceProvider = GetServiceProvider();
 
-            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+            UnitService service = new UnitService(serviceProvider.Object);
+
+            serviceProvider.Setup(s => s.GetService(typeof(UnitService))).Returns(service);
+            serviceProvider.Setup(s => s.GetService(typeof(CoreDbContext))).Returns(dbContext);
+
+            Lib.Models.Unit testData = GetTestData(dbContext);
+
+            //Act
+            IActionResult response = GetController(service).Get();
+
+            //Assert
+            int statusCode = this.GetStatusCode(response);
+            Assert.NotEqual((int)HttpStatusCode.NotFound, statusCode);
         }
 
         [Fact]
-        public async Task Post_Failed_Internal_Server_Error()
+        public void Get_InternalServerError()
         {
+            //Setup
+            Mock<IServiceProvider> serviceProvider = GetServiceProvider();
+            UnitService service = new UnitService(serviceProvider.Object);
+            serviceProvider.Setup(s => s.GetService(typeof(UnitService))).Returns(service);
 
-            UnitViewModel VM = null;
-            var response = await this.Client.PostAsync(URI, new StringContent(JsonConvert.SerializeObject(VM).ToString(), Encoding.UTF8, "application/json"));
+            //Act
+            IActionResult response = GetController(service).Get();
 
-            Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
+            //Assert
+            int statusCode = this.GetStatusCode(response);
+            Assert.Equal((int)HttpStatusCode.InternalServerError, statusCode);
         }
 
         [Fact]
-        public async Task Post_Failed_Bad_Request()
+        public void GetById_Return_OK()
         {
-            UnitViewModel VM = GenerateTestModel();
-            VM.Code = null;
-            var response = await this.Client.PostAsync(URI, new StringContent(JsonConvert.SerializeObject(VM).ToString(), Encoding.UTF8, "application/json"));
+            //Setup
+            CoreDbContext dbContext = _dbContext(GetCurrentAsyncMethod());
+            Mock<IServiceProvider> serviceProvider = GetServiceProvider();
 
-            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+            UnitService service = new UnitService(serviceProvider.Object);
+
+            serviceProvider.Setup(s => s.GetService(typeof(UnitService))).Returns(service);
+            serviceProvider.Setup(s => s.GetService(typeof(CoreDbContext))).Returns(dbContext);
+
+            Lib.Models.Unit testData = GetTestData(dbContext);
+
+            //Act
+            IActionResult response = GetController(service).GetById(testData.Id).Result;
+
+            //Assert
+            int statusCode = this.GetStatusCode(response);
+            Assert.NotEqual((int)HttpStatusCode.NotFound, statusCode);
         }
 
         [Fact]
-        public async Task Get()
+        public void POST_Return_OK()
         {
-            var response = await this.Client.GetAsync(URI);
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            //Setup
+            CoreDbContext dbContext = _dbContext(GetCurrentAsyncMethod());
+            Mock<IServiceProvider> serviceProvider = GetServiceProvider();
+
+            UnitService service = new UnitService(serviceProvider.Object);
+
+            serviceProvider.Setup(s => s.GetService(typeof(UnitService))).Returns(service);
+            serviceProvider.Setup(s => s.GetService(typeof(CoreDbContext))).Returns(dbContext);
+
+            Lib.Models.Unit data = new Lib.Models.Unit();
+            var dataVM = service.MapToViewModel(data);
+            //Act
+            IActionResult response = GetController(service).Post(dataVM).Result;
+
+            //Assert
+            int statusCode = this.GetStatusCode(response);
+            Assert.NotEqual((int)HttpStatusCode.NotFound, statusCode);
         }
 
         [Fact]
-        public async Task GetById()
+        public void POST_InternalServerError()
         {
-            var response = await this.Client.GetAsync(string.Concat(URI, "/"));
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            //Setup
+            Mock<IServiceProvider> serviceProvider = GetServiceProvider();
+            UnitService service = new UnitService(serviceProvider.Object);
+
+            Lib.Models.Unit data = new Lib.Models.Unit();
+            var dataVM = service.MapToViewModel(data);
+            //Act
+            IActionResult response = GetController(service).Post(dataVM).Result;
+
+            //Assert
+            int statusCode = this.GetStatusCode(response);
+            Assert.Equal((int)HttpStatusCode.InternalServerError, statusCode);
         }
 
         [Fact]
-        public async Task Delete()
+        public void POST_BadRequest()
         {
-            Unit Unit = await DataUtil.GetTestDataAsync();
-            UnitViewModel VM = Service.MapToViewModel(Unit);
-            var response = await this.Client.DeleteAsync(string.Concat(URI, "/", VM.Id));
+            //Setup
+            CoreDbContext dbContext = _dbContext(GetCurrentAsyncMethod());
+            Mock<IServiceProvider> serviceProvider = GetServiceProvider();
+            UnitService service = new UnitService(serviceProvider.Object);
+            serviceProvider.Setup(s => s.GetService(typeof(UnitService))).Returns(service);
+            serviceProvider.Setup(s => s.GetService(typeof(CoreDbContext))).Returns(dbContext);
 
-            Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+            Lib.Models.Unit data = new Lib.Models.Unit();
+            var dataVM = service.MapToViewModel(data);
+
+            var validateServiceMock = new Mock<IValidateService>();
+            validateServiceMock.Setup(v => v.Validate(It.IsAny<Unit>())).Verifiable();
+
+            serviceProvider.Setup(sp => sp.GetService(typeof(IValidateService))).Returns(validateServiceMock.Object);
+            //Act
+            IActionResult response = GetController(service).Post(dataVM).Result;
+
+            //Assert
+            int statusCode = this.GetStatusCode(response);
+            Assert.Equal((int)HttpStatusCode.BadRequest, statusCode);
         }
 
         [Fact]
-        public async Task Update()
+        public void Delete_Success()
         {
-            Unit Unit = await DataUtil.GetTestDataAsync();
-            UnitViewModel VM = Service.MapToViewModel(Unit);
-            var response = await this.Client.PutAsync(string.Concat(URI, "/", VM.Id), new StringContent(JsonConvert.SerializeObject(VM).ToString(), Encoding.UTF8, "application/json"));
+            //Setup
+            CoreDbContext dbContext = _dbContext(GetCurrentAsyncMethod());
+            Mock<IServiceProvider> serviceProvider = GetServiceProvider();
+            UnitService service = new UnitService(serviceProvider.Object);
+            serviceProvider.Setup(s => s.GetService(typeof(UnitService))).Returns(service);
+            Lib.Models.Unit testData = GetTestData(dbContext);
+            //Act
+            IActionResult response = GetController(service).Delete(testData.Id).Result;
 
-            Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+            //Assert
+            int statusCode = this.GetStatusCode(response);
+            Assert.Equal((int)HttpStatusCode.InternalServerError, statusCode);
         }
 
+
         [Fact]
-        public async Task NotFound()
+        public void PUT_Return_OK()
         {
-            var response = await this.Client.GetAsync(string.Concat(URI, "/", 0));
-            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+            //Setup
+            CoreDbContext dbContext = _dbContext(GetCurrentAsyncMethod());
+            Mock<IServiceProvider> serviceProvider = GetServiceProvider();
+
+            UnitService service = new UnitService(serviceProvider.Object);
+
+            serviceProvider.Setup(s => s.GetService(typeof(UnitService))).Returns(service);
+            serviceProvider.Setup(s => s.GetService(typeof(CoreDbContext))).Returns(dbContext);
+
+            Lib.Models.Unit testData = GetTestData(dbContext);
+            var dataVM = service.MapToViewModel(testData);
+
+            //Act
+            IActionResult response = GetController(service).Put(testData.Id, dataVM).Result;
+
+            //Assert
+            int statusCode = this.GetStatusCode(response);
+            Assert.NotEqual((int)HttpStatusCode.NotFound, statusCode);
         }
 
         [Fact]
         public async Task GetSimple()
         {
-            var response = await this.Client.GetAsync(string.Concat(URI, "/simple"));
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            CoreDbContext dbContext = _dbContext(GetCurrentAsyncMethod());
+            Mock<IServiceProvider> serviceProvider = GetServiceProvider();
+
+            UnitService service = new UnitService(serviceProvider.Object);
+
+            serviceProvider.Setup(s => s.GetService(typeof(UnitService))).Returns(service);
+            serviceProvider.Setup(s => s.GetService(typeof(CoreDbContext))).Returns(dbContext);
+
+            Lib.Models.Unit testData = GetTestData(dbContext);
+
+            //Act
+            IActionResult response = GetController(service).GetSimple();
+
+            //Assert
+            int statusCode = this.GetStatusCode(response);
+            Assert.NotEqual((int)HttpStatusCode.NotFound, statusCode);
         }
 
     }
