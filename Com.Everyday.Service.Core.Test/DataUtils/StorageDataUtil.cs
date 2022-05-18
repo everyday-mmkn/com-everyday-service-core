@@ -1,5 +1,6 @@
 ﻿using Com.DanLiris.Service.Core.Lib;
 using Com.DanLiris.Service.Core.Lib.Models;
+using Com.DanLiris.Service.Core.Lib.Models.Module;
 using Com.DanLiris.Service.Core.Lib.Services;
 using Com.DanLiris.Service.Core.Lib.ViewModels;
 using Com.DanLiris.Service.Core.Test.Helpers;
@@ -29,6 +30,36 @@ namespace Com.DanLiris.Service.Core.Test.DataUtils
             {
                 Name = string.Format("StorageName {0}", guid),
                 UnitId = 1,
+                Code= string.Format("StorageName {0}", guid),
+                ModuleDestinations =new List<ModuleDestination>()
+                {
+                    new ModuleDestination()
+                    {
+                        ModuleId=1,
+                        StorageId=1,
+                        Module=new Module()
+                        {
+                            Id=1,
+                            Name="name",
+                            Code="code"
+                        }
+                    }
+                },
+                ModuleSources= new List<ModuleSource>()
+                {
+                    new ModuleSource()
+                    {
+                        ModuleId=1,
+                        StorageId=1,
+                        Module =new Module()
+                        {
+                            Id=1,
+                            Name="name",
+                            Code="code"
+                        }
+                    }
+                }
+                
             };
         }
 

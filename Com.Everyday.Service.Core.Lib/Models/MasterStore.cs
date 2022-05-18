@@ -48,11 +48,12 @@ namespace Com.DanLiris.Service.Core.Lib.Models
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
-            // throw new NotImplementedException();
-
             List<ValidationResult> validationResult = new List<ValidationResult>();
+            if (string.IsNullOrWhiteSpace(this.Code))
+                yield return new ValidationResult("Kode tidak boleh kosong", new List<string> { "code" });
 
-            return validationResult;
+            if (string.IsNullOrWhiteSpace(this.Name))
+                yield return new ValidationResult("Nama tidak boleh kosong", new List<string> { "name" });
         }
 
     }

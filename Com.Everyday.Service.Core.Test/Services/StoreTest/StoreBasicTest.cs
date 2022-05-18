@@ -1,12 +1,9 @@
-﻿using Com.Danliris.Service.Core.Test.Helpers;
-using Com.DanLiris.Service.Core.Lib;
+﻿using Com.DanLiris.Service.Core.Lib;
 using Com.DanLiris.Service.Core.Lib.Helpers.IdentityService;
 using Com.DanLiris.Service.Core.Lib.Helpers.ValidateService;
-using Com.DanLiris.Service.Core.Lib.Models;
-using Com.DanLiris.Service.Core.Lib.Models.Module;
 using Com.DanLiris.Service.Core.Lib.Services;
 using Com.DanLiris.Service.Core.Lib.ViewModels;
-using Com.DanLiris.Service.Core.Test.DataUtils;
+using Com.Everyday.Service.Core.Test.DataUtils;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Moq;
@@ -16,13 +13,14 @@ using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text;
 using Xunit;
 
-namespace Com.DanLiris.Service.Core.Test.Services.StorageTests
+namespace Com.Everyday.Service.Core.Test.Services.StoreTest
 {
-    public class StorageBasicTest
+    public class StoreBasicTest
     {
-        private const string ENTITY = "Storages";
+        private const string ENTITY = "Stores";
 
         [MethodImpl(MethodImplOptions.NoInlining)]
         public string GetCurrentMethod()
@@ -46,10 +44,10 @@ namespace Com.DanLiris.Service.Core.Test.Services.StorageTests
         }
 
 
-        private StorageDataUtil _dataUtil(StorageService service)
+        private StoreDataUtil _dataUtil(StoreService service)
         {
             CoreDbContext dbContext = _dbContext(GetCurrentMethod());
-            return new StorageDataUtil(dbContext, service);
+            return new StoreDataUtil(dbContext, service);
         }
 
         Mock<IServiceProvider> GetServiceProvider()
@@ -84,12 +82,12 @@ namespace Com.DanLiris.Service.Core.Test.Services.StorageTests
             CoreDbContext dbContext = _dbContext(GetCurrentAsyncMethod());
             Mock<IServiceProvider> serviceProvider = GetServiceProvider();
 
-            StorageService service = new StorageService(serviceProvider.Object);
+            StoreService service = new StoreService(serviceProvider.Object);
 
-            serviceProvider.Setup(s => s.GetService(typeof(StorageService))).Returns(service);
+            serviceProvider.Setup(s => s.GetService(typeof(StoreService))).Returns(service);
             serviceProvider.Setup(s => s.GetService(typeof(CoreDbContext))).Returns(dbContext);
 
-            // var service = new StorageService(GetServiceProvider().Object);
+            // var service = new StoreService(GetServiceProvider().Object);
             var data = _dataUtil(service).GetNewData();
 
             var Response = await service.CreateAsync(data);
@@ -102,9 +100,9 @@ namespace Com.DanLiris.Service.Core.Test.Services.StorageTests
             CoreDbContext dbContext = _dbContext(GetCurrentAsyncMethod());
             Mock<IServiceProvider> serviceProvider = GetServiceProvider();
 
-            StorageService service = new StorageService(serviceProvider.Object);
+            StoreService service = new StoreService(serviceProvider.Object);
 
-            serviceProvider.Setup(s => s.GetService(typeof(StorageService))).Returns(service);
+            serviceProvider.Setup(s => s.GetService(typeof(StoreService))).Returns(service);
             serviceProvider.Setup(s => s.GetService(typeof(CoreDbContext))).Returns(dbContext);
 
             var data = await _dataUtil(service).GetTestDataAsync();
@@ -119,9 +117,9 @@ namespace Com.DanLiris.Service.Core.Test.Services.StorageTests
             CoreDbContext dbContext = _dbContext(GetCurrentAsyncMethod());
             Mock<IServiceProvider> serviceProvider = GetServiceProvider();
 
-            StorageService service = new StorageService(serviceProvider.Object);
+            StoreService service = new StoreService(serviceProvider.Object);
 
-            serviceProvider.Setup(s => s.GetService(typeof(StorageService))).Returns(service);
+            serviceProvider.Setup(s => s.GetService(typeof(StoreService))).Returns(service);
             serviceProvider.Setup(s => s.GetService(typeof(CoreDbContext))).Returns(dbContext);
             var data = await _dataUtil(service).GetTestDataAsync();
 
@@ -135,9 +133,9 @@ namespace Com.DanLiris.Service.Core.Test.Services.StorageTests
             CoreDbContext dbContext = _dbContext(GetCurrentAsyncMethod());
             Mock<IServiceProvider> serviceProvider = GetServiceProvider();
 
-            StorageService service = new StorageService(serviceProvider.Object);
+            StoreService service = new StoreService(serviceProvider.Object);
 
-            serviceProvider.Setup(s => s.GetService(typeof(StorageService))).Returns(service);
+            serviceProvider.Setup(s => s.GetService(typeof(StoreService))).Returns(service);
             serviceProvider.Setup(s => s.GetService(typeof(CoreDbContext))).Returns(dbContext);
             var data = await _dataUtil(service).GetTestDataAsync();
             var newData = await service.ReadModelById(data.Id);
@@ -152,9 +150,9 @@ namespace Com.DanLiris.Service.Core.Test.Services.StorageTests
             CoreDbContext dbContext = _dbContext(GetCurrentAsyncMethod());
             Mock<IServiceProvider> serviceProvider = GetServiceProvider();
 
-            StorageService service = new StorageService(serviceProvider.Object);
+            StoreService service = new StoreService(serviceProvider.Object);
 
-            serviceProvider.Setup(s => s.GetService(typeof(StorageService))).Returns(service);
+            serviceProvider.Setup(s => s.GetService(typeof(StoreService))).Returns(service);
             serviceProvider.Setup(s => s.GetService(typeof(CoreDbContext))).Returns(dbContext);
             var data = await _dataUtil(service).GetTestDataAsync();
 
@@ -165,13 +163,9 @@ namespace Com.DanLiris.Service.Core.Test.Services.StorageTests
         [Fact]
         public void Validate_Model()
         {
-            CoreDbContext dbContext = _dbContext(GetCurrentAsyncMethod());
             var serviceProvider = GetServiceProvider();
-            StorageService service = new StorageService(serviceProvider.Object);
 
-            serviceProvider.Setup(s => s.GetService(typeof(StorageService))).Returns(service);
-            serviceProvider.Setup(s => s.GetService(typeof(CoreDbContext))).Returns(dbContext);
-            var model = new Storage();
+            var model = new Com.DanLiris.Service.Core.Lib.Models.MasterStore();
             var validationContext = new ValidationContext(model, serviceProvider.Object, null);
 
             var result = model.Validate(validationContext);
@@ -179,53 +173,6 @@ namespace Com.DanLiris.Service.Core.Test.Services.StorageTests
             Assert.NotEmpty(result.ToList());
         }
 
-        [Fact]
-        public async void Validate_ViewModel_Duplicate()
-        {
-            CoreDbContext dbContext = _dbContext(GetCurrentAsyncMethod());
-            Mock<IServiceProvider> serviceProvider = GetServiceProvider();
-
-            StorageService service = new StorageService(serviceProvider.Object);
-
-            serviceProvider.Setup(s => s.GetService(typeof(StorageService))).Returns(service);
-            serviceProvider.Setup(s => s.GetService(typeof(CoreDbContext))).Returns(dbContext);
-
-            var data = await _dataUtil(service).GetTestDataAsync();
-            var viewModel = new StorageViewModel
-            {
-                code="code",
-                moduleSources= new System.Collections.Generic.List<ModuleSourceViewModel>()
-                {
-                    new ModuleSourceViewModel
-                    {
-                        moduleSource=new Lib.ViewModels.Module.ModuleViewModel()
-                        {
-                            Name="name",
-                            _id=1,
-                            Code="code"
-                        },
-                        
-                    }
-                },
-                moduleDestinations= new System.Collections.Generic.List<ModuleDestinationViewModel>()
-                {
-                    new ModuleDestinationViewModel()
-                    {
-                        moduleDestination= new Lib.ViewModels.Module.ModuleViewModel()
-                        {
-                            Name="name",
-                            _id=1,
-                            Code="code"
-                        }
-                    }
-                }
-            };
-
-            var model = service.MapToModel(viewModel);
-            var validationContext = new ValidationContext(model, serviceProvider.Object, null);
-            var result = model.Validate(validationContext);
-
-            Assert.NotEmpty(result.ToList());
-        }
+        
     }
 }
