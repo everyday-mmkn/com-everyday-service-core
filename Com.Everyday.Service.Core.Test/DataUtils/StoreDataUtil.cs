@@ -2,6 +2,7 @@
 using Com.DanLiris.Service.Core.Lib.Models;
 using Com.DanLiris.Service.Core.Lib.Services;
 using Com.DanLiris.Service.Core.Lib.ViewModels;
+using Com.DanLiris.Service.Core.Test.DataUtils;
 using Com.DanLiris.Service.Core.Test.Helpers;
 using Com.DanLiris.Service.Core.Test.Interface;
 using System;
@@ -29,7 +30,8 @@ namespace Com.Everyday.Service.Core.Test.DataUtils
             return new MasterStore()
             {
                 Name = string.Format("StorageName {0}", guid),
-                Code = string.Format("StorageName {0}", guid),
+                Code = "code",
+                StoreCategory="cat",
                 
             };
         }
@@ -40,5 +42,14 @@ namespace Com.Everyday.Service.Core.Test.DataUtils
             await this.Service.CreateModel(data);
             return data;
         }
+
+        //public async Task<MasterStore> GetTestDataAsyncWithStorage()
+        //{
+        //    var storage = await Task.Run(() => StorageDataUtil.GetTestDataAsync());
+        //    var data = GetNewData();
+        //    data.Code = storage.Code;
+        //    await this.Service.CreateModel(data);
+        //    return data;
+        //}
     }
 }

@@ -6,6 +6,7 @@ using Com.Everyday.Service.Core.Test.DataUtils;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Moq;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -108,6 +109,20 @@ namespace Com.Everyday.Service.Core.Test.Services.MasterExpeditionTests
 
             var Response = service.ReadModel(1, 25, "{}", null, data.Name, "{}");
             Assert.NotEmpty(Response.Item1);
+
+            Dictionary<string, string> order = new Dictionary<string, string>()
+            {
+                {"Code", "asc" }
+            };
+            var response2 = service.ReadModel(1, 25, JsonConvert.SerializeObject(order), null, data.Name, "{}");
+            Assert.NotEmpty(response2.Item1);
+
+            Dictionary<string, string> order1 = new Dictionary<string, string>()
+            {
+                {"Code", "desc" }
+            };
+            var response3 = service.ReadModel(1, 25, JsonConvert.SerializeObject(order1), null, data.Name, "{}");
+            Assert.NotEmpty(response3.Item1);
         }
 
         [Fact]
@@ -170,6 +185,22 @@ namespace Com.Everyday.Service.Core.Test.Services.MasterExpeditionTests
             var result = model.Validate(validationContext);
 
             Assert.NotEmpty(result.ToList());
+        }
+
+        [Fact]
+        public async void Should_Success_Get_Data_By_Code()
+        {
+            CoreDbContext dbContext = _dbContext(GetCurrentAsyncMethod());
+            Mock<IServiceProvider> serviceProvider = GetServiceProvider();
+
+            ExpeditionService service = new ExpeditionService(serviceProvider.Object);
+
+            serviceProvider.Setup(s => s.GetService(typeof(ExpeditionService))).Returns(service);
+            serviceProvider.Setup(s => s.GetService(typeof(CoreDbContext))).Returns(dbContext);
+            var data = await _dataUtil(service).GetTestDataAsync();
+
+            var Response = service.GetbyCode(data.Code);
+            Assert.NotNull(Response);
         }
     }
 }

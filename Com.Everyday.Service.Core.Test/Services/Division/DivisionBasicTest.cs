@@ -9,6 +9,7 @@ using Com.DanLiris.Service.Core.Test.DataUtils;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Moq;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -111,6 +112,20 @@ namespace Com.DanLiris.Service.Core.Test.Services.Division
 
             var Response = service.ReadModel(1, 25, "{}", null, data.Name, "{}");
             Assert.NotEmpty(Response.Item1);
+
+            Dictionary<string, string> order = new Dictionary<string, string>()
+            {
+                {"Code", "asc" }
+            };
+            var response2 = service.ReadModel(1, 25, JsonConvert.SerializeObject(order), null, data.Name, "{}");
+            Assert.NotEmpty(response2.Item1);
+
+            Dictionary<string, string> order1 = new Dictionary<string, string>()
+            {
+                {"Code", "desc" }
+            };
+            var response3 = service.ReadModel(1, 25, JsonConvert.SerializeObject(order1), null, data.Name, "{}");
+            Assert.NotEmpty(response3.Item1);
         }
 
         [Fact]
@@ -199,6 +214,44 @@ namespace Com.DanLiris.Service.Core.Test.Services.Division
             var result = model.Validate(validationContext);
 
             Assert.NotEmpty(result.ToList());
+        }
+
+        [Fact]
+        public async void Should_Fail_Upload_Validate_Data()
+        {
+            CoreDbContext dbContext = _dbContext(GetCurrentAsyncMethod());
+            Mock<IServiceProvider> serviceProvider = GetServiceProvider();
+
+            DivisionService service = new DivisionService(serviceProvider.Object);
+
+            serviceProvider.Setup(s => s.GetService(typeof(DivisionService))).Returns(service);
+            serviceProvider.Setup(s => s.GetService(typeof(CoreDbContext))).Returns(dbContext);
+            var data = await _dataUtil(service).GetTestDataAsync();
+            var viewModel = service.MapToViewModel(data);
+
+            List<DivisionViewModel> div = new List<DivisionViewModel>() { new DivisionViewModel() };
+            var Response = service.UploadValidate(div, null);
+            Assert.False(Response.Item1);
+        }
+
+        [Fact]
+        public async void Should_Fail_Upload_Validate_Double_Uploaded_Data()
+        {
+
+            CoreDbContext dbContext = _dbContext(GetCurrentAsyncMethod());
+            Mock<IServiceProvider> serviceProvider = GetServiceProvider();
+
+            DivisionService service = new DivisionService(serviceProvider.Object);
+
+            serviceProvider.Setup(s => s.GetService(typeof(DivisionService))).Returns(service);
+            serviceProvider.Setup(s => s.GetService(typeof(CoreDbContext))).Returns(dbContext);
+            var data = await _dataUtil(service).GetTestDataAsync();
+            var viewModel = service.MapToViewModel(data);
+            var viewModel2 = service.MapToViewModel(data);
+
+            List<DivisionViewModel> units = new List<DivisionViewModel>() { viewModel, viewModel2 };
+            var Response = service.UploadValidate(units, null);
+            Assert.False(Response.Item1);
         }
     }
 }

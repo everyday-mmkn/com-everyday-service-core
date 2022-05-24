@@ -1,5 +1,6 @@
 ﻿using Com.Danliris.Service.Core.Test.Helpers;
 using Com.DanLiris.Service.Core.Lib;
+using Com.DanLiris.Service.Core.Lib.Helpers;
 using Com.DanLiris.Service.Core.Lib.Helpers.IdentityService;
 using Com.DanLiris.Service.Core.Lib.Helpers.ValidateService;
 using Com.DanLiris.Service.Core.Lib.Models;
@@ -10,6 +11,7 @@ using Com.DanLiris.Service.Core.Test.DataUtils;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Moq;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -111,6 +113,20 @@ namespace Com.DanLiris.Service.Core.Test.Services.StorageTests
 
             var Response = service.ReadModel(1, 25, "{}", null, data.Name, "{}");
             Assert.NotEmpty(Response.Item1);
+
+            Dictionary<string, string> order = new Dictionary<string, string>()
+            {
+                {"Code", "asc" }
+            };
+            var response2 = service.ReadModel(1, 25, JsonConvert.SerializeObject(order), null, data.Name, "{}");
+            Assert.NotEmpty(response2.Item1);
+
+            Dictionary<string, string> order1 = new Dictionary<string, string>()
+            {
+                {"Code", "desc" }
+            };
+            var response3 = service.ReadModel(1, 25, JsonConvert.SerializeObject(order1), null, data.Name, "{}");
+            Assert.NotEmpty(response3.Item1);
         }
 
         [Fact]
@@ -130,6 +146,72 @@ namespace Com.DanLiris.Service.Core.Test.Services.StorageTests
         }
 
         [Fact]
+        public async void Should_Success_Get_Storage()
+        {
+            CoreDbContext dbContext = _dbContext(GetCurrentAsyncMethod());
+            Mock<IServiceProvider> serviceProvider = GetServiceProvider();
+
+            StorageService service = new StorageService(serviceProvider.Object);
+
+            serviceProvider.Setup(s => s.GetService(typeof(StorageService))).Returns(service);
+            serviceProvider.Setup(s => s.GetService(typeof(CoreDbContext))).Returns(dbContext);
+            var data = await _dataUtil(service).GetTestDataAsync();
+
+            var Response = await service.GetStorage1(data.Id.ToString());
+            Assert.NotNull(Response);
+        }
+
+        [Fact]
+        public async void Should_Success_Get_Destination()
+        {
+            CoreDbContext dbContext = _dbContext(GetCurrentAsyncMethod());
+            Mock<IServiceProvider> serviceProvider = GetServiceProvider();
+
+            StorageService service = new StorageService(serviceProvider.Object);
+
+            serviceProvider.Setup(s => s.GetService(typeof(StorageService))).Returns(service);
+            serviceProvider.Setup(s => s.GetService(typeof(CoreDbContext))).Returns(dbContext);
+
+            var data = await _dataUtil(service).GetTestDataAsync();
+
+            var Response = service.GetDestination(1, 25, "{}", null, data.Name, "{}");
+            Assert.NotEmpty(Response.Item1);
+        }
+
+        [Fact]
+        public async void Should_Success_Get_Source()
+        {
+            CoreDbContext dbContext = _dbContext(GetCurrentAsyncMethod());
+            Mock<IServiceProvider> serviceProvider = GetServiceProvider();
+
+            StorageService service = new StorageService(serviceProvider.Object);
+
+            serviceProvider.Setup(s => s.GetService(typeof(StorageService))).Returns(service);
+            serviceProvider.Setup(s => s.GetService(typeof(CoreDbContext))).Returns(dbContext);
+
+            var data = await _dataUtil(service).GetTestDataAsync();
+
+            var Response = service.GetSource(1, 25, "{}", null, data.Name, "{}");
+            Assert.NotEmpty(Response.Item1);
+        }
+
+        [Fact]
+        public async void Should_Success_Get_Data_By_Code()
+        {
+            CoreDbContext dbContext = _dbContext(GetCurrentAsyncMethod());
+            Mock<IServiceProvider> serviceProvider = GetServiceProvider();
+
+            StorageService service = new StorageService(serviceProvider.Object);
+
+            serviceProvider.Setup(s => s.GetService(typeof(StorageService))).Returns(service);
+            serviceProvider.Setup(s => s.GetService(typeof(CoreDbContext))).Returns(dbContext);
+            var data = await _dataUtil(service).GetTestDataAsync();
+
+            var Response = service.GetStoragebyCode(data.Code);
+            Assert.NotNull(Response);
+        }
+
+        [Fact]
         public async void Should_Success_Update_Data()
         {
             CoreDbContext dbContext = _dbContext(GetCurrentAsyncMethod());
@@ -145,6 +227,49 @@ namespace Com.DanLiris.Service.Core.Test.Services.StorageTests
             var Response = await service.UpdateAsync(newData.Id, newData);
             Assert.NotEqual(0, Response);
         }
+
+        [Fact]
+        public async void Should_Error_Update_Data_invalidId()
+        {
+            CoreDbContext dbContext = _dbContext(GetCurrentAsyncMethod());
+            Mock<IServiceProvider> serviceProvider = GetServiceProvider();
+
+            StorageService service = new StorageService(serviceProvider.Object);
+
+            serviceProvider.Setup(s => s.GetService(typeof(StorageService))).Returns(service);
+            serviceProvider.Setup(s => s.GetService(typeof(CoreDbContext))).Returns(dbContext);
+            var data = await _dataUtil(service).GetTestDataAsync();
+            var newData = await service.ReadModelById(data.Id);
+
+            //var Response = await service.UpdateModel(2, newData);
+            Exception exception = await Assert.ThrowsAsync<Exception>(() => service.UpdateModel(0, newData));
+            Assert.Equal("Invalid Id", exception.Message);
+        }
+
+        //[Fact]
+        //public async void Should_Success_Update_Data_newItems()
+        //{
+        //    CoreDbContext dbContext = _dbContext(GetCurrentAsyncMethod());
+        //    Mock<IServiceProvider> serviceProvider = GetServiceProvider();
+
+        //    StorageService service = new StorageService(serviceProvider.Object);
+
+        //    serviceProvider.Setup(s => s.GetService(typeof(StorageService))).Returns(service);
+        //    serviceProvider.Setup(s => s.GetService(typeof(CoreDbContext))).Returns(dbContext);
+        //    var data = await _dataUtil(service).GetTestDataAsync();
+        //    var newData = await service.ReadModelById(data.Id);
+        //    newData.ModuleDestinations.Add(data.ModuleDestinations.First());
+        //    //newData.ModuleSources.Add(data.ModuleSources.First());
+
+        //    var Response = await service.UpdateModel(newData.Id, newData);
+        //    Assert.NotEqual(0, Response);
+
+
+        //    newData.ModuleSources.Remove(data.ModuleSources.First());
+        //    newData.ModuleDestinations.Remove(data.ModuleDestinations.First());
+        //    var Response2 = await service.UpdateModel(newData.Id, newData);
+        //    Assert.NotEqual(0, Response);
+        //}
 
         [Fact]
         public async void Should_Success_Delete_Data()

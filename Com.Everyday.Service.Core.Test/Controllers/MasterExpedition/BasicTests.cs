@@ -126,6 +126,49 @@ namespace Com.Everyday.Service.Core.Test.Controllers.MasterExpedition
         }
 
         [Fact]
+        public void GetByCode_Return_OK()
+        {
+            //Setup
+            CoreDbContext dbContext = _dbContext(GetCurrentAsyncMethod());
+            Mock<IServiceProvider> serviceProvider = GetServiceProvider();
+
+            ExpeditionService service = new ExpeditionService(serviceProvider.Object);
+
+            serviceProvider.Setup(s => s.GetService(typeof(ExpeditionService))).Returns(service);
+            serviceProvider.Setup(s => s.GetService(typeof(CoreDbContext))).Returns(dbContext);
+
+            Com.DanLiris.Service.Core.Lib.Models.MasterExpedition testData = GetTestData(dbContext);
+
+            //Act
+            IActionResult response = GetController(service).GetCode(testData.Code);
+
+            //Assert
+            int statusCode = this.GetStatusCode(response);
+            Assert.NotEqual((int)HttpStatusCode.NotFound, statusCode);
+        }
+
+        [Fact]
+        public void GetByCode_InternalServerError()
+        {
+            //Setup
+            CoreDbContext dbContext = _dbContext(GetCurrentAsyncMethod());
+            Mock<IServiceProvider> serviceProvider = GetServiceProvider();
+
+            ExpeditionService service = new ExpeditionService(serviceProvider.Object);
+
+            serviceProvider.Setup(s => s.GetService(typeof(ExpeditionService))).Returns(service);
+
+            Com.DanLiris.Service.Core.Lib.Models.MasterExpedition testData = GetTestData(dbContext);
+
+            //Act
+            IActionResult response = GetController(service).GetCode(testData.Code);
+
+            //Assert
+            int statusCode = this.GetStatusCode(response);
+            Assert.NotEqual((int)HttpStatusCode.NotFound, statusCode);
+        }
+
+        [Fact]
         public void Get_InternalServerError()
         {
             //Setup
