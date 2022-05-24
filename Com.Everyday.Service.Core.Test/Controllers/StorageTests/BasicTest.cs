@@ -130,6 +130,82 @@ namespace Com.DanLiris.Service.Core.Test.Controllers.StorageTests
         }
 
         [Fact]
+        public void GetSource_Return_OK()
+        {
+            //Setup
+            CoreDbContext dbContext = _dbContext(GetCurrentAsyncMethod());
+            Mock<IServiceProvider> serviceProvider = GetServiceProvider();
+
+            StorageService service = new StorageService(serviceProvider.Object);
+
+            serviceProvider.Setup(s => s.GetService(typeof(StorageService))).Returns(service);
+            serviceProvider.Setup(s => s.GetService(typeof(CoreDbContext))).Returns(dbContext);
+
+            Lib.Models.Storage testData = GetTestData(dbContext);
+
+            //Act
+            IActionResult response = GetController(service).GetSource();
+
+            //Assert
+            int statusCode = this.GetStatusCode(response);
+            Assert.NotEqual((int)HttpStatusCode.NotFound, statusCode);
+        }
+
+        [Fact]
+        public void GetDestination_Return_OK()
+        {
+            //Setup
+            CoreDbContext dbContext = _dbContext(GetCurrentAsyncMethod());
+            Mock<IServiceProvider> serviceProvider = GetServiceProvider();
+
+            StorageService service = new StorageService(serviceProvider.Object);
+
+            serviceProvider.Setup(s => s.GetService(typeof(StorageService))).Returns(service);
+            serviceProvider.Setup(s => s.GetService(typeof(CoreDbContext))).Returns(dbContext);
+
+            Lib.Models.Storage testData = GetTestData(dbContext);
+
+            //Act
+            IActionResult response = GetController(service).GetDestination();
+
+            //Assert
+            int statusCode = this.GetStatusCode(response);
+            Assert.NotEqual((int)HttpStatusCode.NotFound, statusCode);
+        }
+
+        [Fact]
+        public void GetSource_InternalServerError()
+        {
+            //Setup
+            Mock<IServiceProvider> serviceProvider = GetServiceProvider();
+            StorageService service = new StorageService(serviceProvider.Object);
+            serviceProvider.Setup(s => s.GetService(typeof(StorageService))).Returns(service);
+
+            //Act
+            IActionResult response = GetController(service).GetSource();
+
+            //Assert
+            int statusCode = this.GetStatusCode(response);
+            Assert.Equal((int)HttpStatusCode.InternalServerError, statusCode);
+        }
+
+        [Fact]
+        public void GetDestination_InternalServerError()
+        {
+            //Setup
+            Mock<IServiceProvider> serviceProvider = GetServiceProvider();
+            StorageService service = new StorageService(serviceProvider.Object);
+            serviceProvider.Setup(s => s.GetService(typeof(StorageService))).Returns(service);
+
+            //Act
+            IActionResult response = GetController(service).GetDestination();
+
+            //Assert
+            int statusCode = this.GetStatusCode(response);
+            Assert.Equal((int)HttpStatusCode.InternalServerError, statusCode);
+        }
+
+        [Fact]
         public void Get_InternalServerError()
         {
             //Setup
@@ -161,6 +237,50 @@ namespace Com.DanLiris.Service.Core.Test.Controllers.StorageTests
 
             //Act
             IActionResult response = GetController(service).GetById(testData.Id).Result;
+
+            //Assert
+            int statusCode = this.GetStatusCode(response);
+            Assert.NotEqual((int)HttpStatusCode.NotFound, statusCode);
+        }
+
+        [Fact]
+        public void GetStorage_Return_OK()
+        {
+            //Setup
+            CoreDbContext dbContext = _dbContext(GetCurrentAsyncMethod());
+            Mock<IServiceProvider> serviceProvider = GetServiceProvider();
+
+            StorageService service = new StorageService(serviceProvider.Object);
+
+            serviceProvider.Setup(s => s.GetService(typeof(StorageService))).Returns(service);
+            serviceProvider.Setup(s => s.GetService(typeof(CoreDbContext))).Returns(dbContext);
+
+            Lib.Models.Storage testData = GetTestData(dbContext);
+
+            //Act
+            IActionResult response = GetController(service).GetRO(testData.Id.ToString()).Result;
+
+            //Assert
+            int statusCode = this.GetStatusCode(response);
+            Assert.NotEqual((int)HttpStatusCode.NotFound, statusCode);
+        }
+
+        [Fact]
+        public void GetStorageByCode_Return_OK()
+        {
+            //Setup
+            CoreDbContext dbContext = _dbContext(GetCurrentAsyncMethod());
+            Mock<IServiceProvider> serviceProvider = GetServiceProvider();
+
+            StorageService service = new StorageService(serviceProvider.Object);
+
+            serviceProvider.Setup(s => s.GetService(typeof(StorageService))).Returns(service);
+            serviceProvider.Setup(s => s.GetService(typeof(CoreDbContext))).Returns(dbContext);
+
+            Lib.Models.Storage testData = GetTestData(dbContext);
+
+            //Act
+            IActionResult response = GetController(service).GetSource(testData.Code);
 
             //Assert
             int statusCode = this.GetStatusCode(response);
@@ -290,6 +410,22 @@ namespace Com.DanLiris.Service.Core.Test.Controllers.StorageTests
             //Assert
             int statusCode = this.GetStatusCode(response);
             Assert.NotEqual((int)HttpStatusCode.NotFound, statusCode);
+        }
+
+        [Fact]
+        public void GetStorage_InternalServerError()
+        {
+            //Setup
+            Mock<IServiceProvider> serviceProvider = GetServiceProvider();
+            StorageService service = new StorageService(serviceProvider.Object);
+            serviceProvider.Setup(s => s.GetService(typeof(StorageService))).Returns(service);
+
+            //Act
+            IActionResult response = GetController(service).GetRO("1").Result;
+
+            //Assert
+            int statusCode = this.GetStatusCode(response);
+            Assert.Equal((int)HttpStatusCode.InternalServerError, statusCode);
         }
 
     }

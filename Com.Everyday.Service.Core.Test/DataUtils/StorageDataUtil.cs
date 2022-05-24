@@ -31,6 +31,7 @@ namespace Com.DanLiris.Service.Core.Test.DataUtils
                 Name = string.Format("StorageName {0}", guid),
                 UnitId = 1,
                 Code= string.Format("StorageName {0}", guid),
+                UId= string.Format("StorageName {0}", guid),
                 ModuleDestinations =new List<ModuleDestination>()
                 {
                     new ModuleDestination()
@@ -41,8 +42,10 @@ namespace Com.DanLiris.Service.Core.Test.DataUtils
                         {
                             Id=1,
                             Name="name",
-                            Code="code"
-                        }
+                            Code=string.Format("StorageName {0}", guid)
+                        },
+                        UId=string.Format("StorageName {0}", guid),
+                        DestinationValue=string.Format("StorageName {0}", guid),
                     }
                 },
                 ModuleSources= new List<ModuleSource>()
@@ -55,8 +58,10 @@ namespace Com.DanLiris.Service.Core.Test.DataUtils
                         {
                             Id=1,
                             Name="name",
-                            Code="code"
-                        }
+                            Code=string.Format("StorageName {0}", guid)
+                        },
+                        UId=string.Format("StorageName {0}", guid),
+                        SourceValue=string.Format("StorageName {0}", guid),
                     }
                 }
                 

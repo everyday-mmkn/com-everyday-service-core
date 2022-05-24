@@ -79,6 +79,8 @@ namespace Com.Everyday.Service.Core.Test.Controllers.StoreTests
         public MasterStore GetTestData(CoreDbContext dbContext)
         {
             MasterStore data = new MasterStore();
+            data.StoreCategory = "cat";
+            data.Code = "code";
             dbContext.MasterStores.Add(data);
             dbContext.SaveChanges();
 
@@ -289,6 +291,125 @@ namespace Com.Everyday.Service.Core.Test.Controllers.StoreTests
             //Assert
             int statusCode = this.GetStatusCode(response);
             Assert.NotEqual((int)HttpStatusCode.NotFound, statusCode);
+        }
+
+        [Fact]
+        public void GetByCode_InternalServerError()
+        {
+            //Setup
+            Mock<IServiceProvider> serviceProvider = GetServiceProvider();
+            StoreService service = new StoreService(serviceProvider.Object);
+            serviceProvider.Setup(s => s.GetService(typeof(StoreService))).Returns(service);
+
+            //Act
+            IActionResult response = GetController(service).GetbyCode(null).Result;
+
+            //Assert
+            int statusCode = this.GetStatusCode(response);
+            Assert.Equal((int)HttpStatusCode.InternalServerError, statusCode);
+        }
+
+        [Fact]
+        public void GetByCode_Return_OK()
+        {
+            //Setup
+            CoreDbContext dbContext = _dbContext(GetCurrentAsyncMethod());
+            Mock<IServiceProvider> serviceProvider = GetServiceProvider();
+
+            StoreService service = new StoreService(serviceProvider.Object);
+
+            serviceProvider.Setup(s => s.GetService(typeof(StoreService))).Returns(service);
+            serviceProvider.Setup(s => s.GetService(typeof(CoreDbContext))).Returns(dbContext);
+
+            MasterStore testData = GetTestData(dbContext);
+
+            //Act
+            IActionResult response = GetController(service).GetbyCode(testData.Code).Result;
+
+            //Assert
+            int statusCode = this.GetStatusCode(response);
+            Assert.NotEqual((int)HttpStatusCode.NotFound, statusCode);
+        }
+
+        [Fact]
+        public void GetByCategory_Return_OK()
+        {
+            //Setup
+            CoreDbContext dbContext = _dbContext(GetCurrentAsyncMethod());
+            Mock<IServiceProvider> serviceProvider = GetServiceProvider();
+
+            StoreService service = new StoreService(serviceProvider.Object);
+
+            serviceProvider.Setup(s => s.GetService(typeof(StoreService))).Returns(service);
+            serviceProvider.Setup(s => s.GetService(typeof(CoreDbContext))).Returns(dbContext);
+
+            MasterStore testData = GetTestData(dbContext);
+
+            //Act
+            IActionResult response = GetController(service).GetRO(testData.StoreCategory).Result;
+
+            //Assert
+            int statusCode = this.GetStatusCode(response);
+            Assert.NotEqual((int)HttpStatusCode.NotFound, statusCode);
+        }
+
+        [Fact]
+        public void GetByCategory_InternalServerError()
+        {
+            //Setup
+            CoreDbContext dbContext = _dbContext(GetCurrentAsyncMethod());
+            Mock<IServiceProvider> serviceProvider = GetServiceProvider();
+
+            StoreService service = new StoreService(serviceProvider.Object);
+
+            serviceProvider.Setup(s => s.GetService(typeof(StoreService))).Returns(service);
+            serviceProvider.Setup(s => s.GetService(typeof(CoreDbContext))).Returns(dbContext);
+
+            MasterStore testData = GetTestData(dbContext);
+
+            //Act
+            IActionResult response = GetController(service).GetRO(null).Result;
+
+            //Assert
+            int statusCode = this.GetStatusCode(response);
+            Assert.NotEqual((int)HttpStatusCode.NotFound, statusCode);
+        }
+
+        [Fact]
+        public async void GetByCodeStoreStorage_Return_OK()
+        {
+            //Setup
+            CoreDbContext dbContext = _dbContext(GetCurrentAsyncMethod());
+            Mock<IServiceProvider> serviceProvider = GetServiceProvider();
+
+            StoreService service = new StoreService(serviceProvider.Object);
+
+            serviceProvider.Setup(s => s.GetService(typeof(StoreService))).Returns(service);
+            serviceProvider.Setup(s => s.GetService(typeof(CoreDbContext))).Returns(dbContext);
+
+            MasterStore testData = GetTestData(dbContext);
+            //Act
+            IActionResult response = GetController(service).GetStoreStoragebyCode(testData.Code).Result;
+
+            //Assert
+            int statusCode = this.GetStatusCode(response);
+            Assert.NotEqual((int)HttpStatusCode.NotFound, statusCode);
+        }
+
+        [Fact]
+        public void GetByCodeStoreStorage_InternalServerError()
+        {
+            //Setup
+            Mock<IServiceProvider> serviceProvider = GetServiceProvider();
+            StoreService service = new StoreService(serviceProvider.Object);
+            serviceProvider.Setup(s => s.GetService(typeof(StoreService))).Returns(service);
+
+            //Act
+            IActionResult response = GetController(service).GetStoreStoragebyCode(null).Result;
+
+            //Assert
+            int statusCode = this.GetStatusCode(response);
+            Assert.Equal((int)HttpStatusCode.InternalServerError, statusCode);
         }
     }
 }

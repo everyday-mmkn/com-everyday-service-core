@@ -294,5 +294,25 @@ namespace Com.DanLiris.Service.Core.Test.Controllers.UnitTest
             Assert.NotEqual((int)HttpStatusCode.NotFound, statusCode);
         }
 
+        [Fact]
+        public async Task GetSimple_InternalServerError()
+        {
+            CoreDbContext dbContext = _dbContext(GetCurrentAsyncMethod());
+            Mock<IServiceProvider> serviceProvider = GetServiceProvider();
+
+            UnitService service = new UnitService(serviceProvider.Object);
+
+            serviceProvider.Setup(s => s.GetService(typeof(UnitService))).Returns(service);
+
+            Lib.Models.Unit testData = GetTestData(dbContext);
+
+            //Act
+            IActionResult response = GetController(service).GetSimple();
+
+            //Assert
+            int statusCode = this.GetStatusCode(response);
+            Assert.NotEqual((int)HttpStatusCode.NotFound, statusCode);
+        }
+
     }
 }
