@@ -34,7 +34,7 @@ namespace Com.DanLiris.Service.Core.Lib.Services
             {
                 List<string> SearchAttributes = new List<string>()
                 {
-                    "Code", "Name", "UnitName"
+                    "Code", "Name", "UnitName","Description"
                 };
 
                 Query = Query.Where(General.BuildSearch(SearchAttributes), Keyword);
@@ -43,7 +43,7 @@ namespace Com.DanLiris.Service.Core.Lib.Services
             /* Const Select */
             List<string> SelectedFields = new List<string>()
             {
-                "_id", "code", "name", "unit"
+                "_id", "code", "name", "unit","description"
             };
 
             Query = Query
@@ -415,6 +415,13 @@ namespace Com.DanLiris.Service.Core.Lib.Services
                         {
                             oldM.ModuleDestinations.Add(item);
                         }
+
+                        oldM.Address = Model.Address;
+                        oldM.Phone = Model.Phone;
+                        oldM.UnitName = Model.UnitName;
+                        oldM.UnitId = Model.UnitId;
+                        oldM.DivisionName = Model.DivisionName;
+                        oldM.Description = Model.Description;
 
                         Updated = await DbContext.SaveChangesAsync();
                         transaction.Commit();
