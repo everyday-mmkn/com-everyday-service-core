@@ -411,5 +411,42 @@ namespace Com.Everyday.Service.Core.Test.Controllers.StoreTests
             int statusCode = this.GetStatusCode(response);
             Assert.Equal((int)HttpStatusCode.InternalServerError, statusCode);
         }
+
+        [Fact]
+        public async void GetNearestByCodeStoreStorage_Return_OK()
+        {
+            //Setup
+            CoreDbContext dbContext = _dbContext(GetCurrentAsyncMethod());
+            Mock<IServiceProvider> serviceProvider = GetServiceProvider();
+
+            StoreService service = new StoreService(serviceProvider.Object);
+
+            serviceProvider.Setup(s => s.GetService(typeof(StoreService))).Returns(service);
+            serviceProvider.Setup(s => s.GetService(typeof(CoreDbContext))).Returns(dbContext);
+
+            MasterStore testData = GetTestData(dbContext);
+            //Act
+            IActionResult response = GetController(service).GetNearest(testData.Code).Result;
+
+            //Assert
+            int statusCode = this.GetStatusCode(response);
+            Assert.NotEqual((int)HttpStatusCode.NotFound, statusCode);
+        }
+
+        [Fact]
+        public void GetNearestByCodeStoreStorage_InternalServerError()
+        {
+            //Setup
+            Mock<IServiceProvider> serviceProvider = GetServiceProvider();
+            StoreService service = new StoreService(serviceProvider.Object);
+            serviceProvider.Setup(s => s.GetService(typeof(StoreService))).Returns(service);
+
+            //Act
+            IActionResult response = GetController(service).GetNearest(null).Result;
+
+            //Assert
+            int statusCode = this.GetStatusCode(response);
+            Assert.Equal((int)HttpStatusCode.InternalServerError, statusCode);
+        }
     }
 }
