@@ -58,7 +58,7 @@ namespace Com.DanLiris.Service.Core.Lib.Models
                 yield return new ValidationResult("Kode sudah ada", new List<string> { "code" });
             }
 
-            if ( ModuleSources==null && ModuleDestinations==null)
+            if ( ModuleSources.Count==0 && ModuleDestinations.Count == 0)
             {
                 yield return new ValidationResult("silakan pilih module destination/source", new List<string> { "modules" });
             }
