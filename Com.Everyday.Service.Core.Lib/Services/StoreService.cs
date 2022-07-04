@@ -34,7 +34,7 @@ namespace Com.DanLiris.Service.Core.Lib.Services
             {
                 List<string> SearchAttributes = new List<string>()
                 {
-                     "Code","Name"
+                     "Code","Name","Address","City"
                 };
 
                 Query = Query.Where(General.BuildSearch(SearchAttributes), Keyword);
@@ -58,8 +58,8 @@ namespace Com.DanLiris.Service.Core.Lib.Services
                     OnlineOffline = b.OnlineOffline,
                     Status = b.Status,
                     SalesCategory = b.SalesCategory,
-                    //Longitude = b.Longitude,
-                    //Latitude = b.Latitude,
+                    Longitude = b.Longitude,
+                    Latitude = b.Latitude,
                     Pic = b.Pic,
                     Phone = b.Phone,
                     City=b.City
@@ -125,8 +125,8 @@ namespace Com.DanLiris.Service.Core.Lib.Services
             seasonVM.storeArea = season.StoreArea;
             seasonVM.storeCategory = season.StoreCategory;
             seasonVM.storeWide = season.StoreWide;
-            //seasonVM.longitude = season.Longitude;
-            //seasonVM.latitude = season.Latitude;
+            seasonVM.longitude = season.Longitude;
+            seasonVM.latitude = season.Latitude;
 
             return seasonVM;
         }
@@ -148,7 +148,7 @@ namespace Com.DanLiris.Service.Core.Lib.Services
             season.Code = seasonVM.code;
             season.Name = seasonVM.name;
             season.Address = seasonVM.address;
-            season.City = season.City;
+            season.City = seasonVM.city;
             season.ClosedDate = seasonVM.closedDate;
             season.Description = seasonVM.description;
             season.MonthlyTotalCost = seasonVM.monthlyTotalCost;
@@ -163,8 +163,8 @@ namespace Com.DanLiris.Service.Core.Lib.Services
             season.StoreArea = seasonVM.storeArea;
             season.StoreCategory = seasonVM.storeCategory;
             season.StoreWide = seasonVM.storeWide;
-            //season.Longitude = seasonVM.longitude;
-            //season.Latitude = seasonVM.latitude;
+            season.Longitude = seasonVM.longitude;
+            season.Latitude = seasonVM.latitude;
 
             return season;
         }
@@ -193,6 +193,17 @@ namespace Com.DanLiris.Service.Core.Lib.Services
                          where a.Code.Contains((string.IsNullOrWhiteSpace(code) ? a.Code : code))
                          select a).FirstOrDefaultAsync();
             return store;
+        }
+
+        public Task<List<MasterStore>> GetNearestStoreByCode(string code)
+        {
+            var store = (from a in DbContext.MasterStores
+                         where a.Code == code
+                         select a).Single();
+            var nearest= (from x in DbContext.MasterStores
+                          where x.City.Contains(store.City)
+                          select x).ToListAsync();
+            return nearest;
         }
 
         public Task<StoreStorageViewModel> GetStoreStorageByCode(string code)

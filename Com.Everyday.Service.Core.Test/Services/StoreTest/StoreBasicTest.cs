@@ -210,30 +210,46 @@ namespace Com.Everyday.Service.Core.Test.Services.StoreTest
             Assert.NotNull(Response);
         }
 
-        //[Fact]
-        //public async void Should_Success_Get_Data_By_Code()
-        //{
-        //    CoreDbContext dbContext = _dbContext(GetCurrentAsyncMethod());
-        //    Mock<IServiceProvider> serviceProvider = GetServiceProvider();
-        //    Mock<IServiceProvider> storageServiceProvider = GetServiceProvider();
+        [Fact]
+        public async void Should_Success_Get_Data_Nearest()
+        {
+            CoreDbContext dbContext = _dbContext(GetCurrentAsyncMethod());
+            Mock<IServiceProvider> serviceProvider = GetServiceProvider();
 
-        //    StoreService service = new StoreService(serviceProvider.Object);
-        //    StorageService storageService = new StorageService(serviceProvider.Object);
+            StoreService service = new StoreService(serviceProvider.Object);
 
-        //    serviceProvider.Setup(s => s.GetService(typeof(StoreService))).Returns(service);
-        //    serviceProvider.Setup(s => s.GetService(typeof(CoreDbContext))).Returns(dbContext);
+            serviceProvider.Setup(s => s.GetService(typeof(StoreService))).Returns(service);
+            serviceProvider.Setup(s => s.GetService(typeof(CoreDbContext))).Returns(dbContext);
+            var data = await _dataUtil(service).GetTestDataAsync();
 
-        //    storageServiceProvider.Setup(s => s.GetService(typeof(StorageService))).Returns(storageService);
-        //    storageServiceProvider.Setup(s => s.GetService(typeof(CoreDbContext))).Returns(dbContext);
+            var Response = await service.GetNearestStoreByCode(data.Code);
+            Assert.NotNull(Response);
+        }
 
-        //    var dataStorage = await _dataUtilStorage(storageService).GetTestDataAsync();
-        //    var data = _dataUtil(service).GetNewData();
-        //    data.Code = dataStorage.Code;
-        //    var createdData = await service.CreateAsync(data);
+            //[Fact]
+            //public async void Should_Success_Get_Data_By_Code()
+            //{
+            //    CoreDbContext dbContext = _dbContext(GetCurrentAsyncMethod());
+            //    Mock<IServiceProvider> serviceProvider = GetServiceProvider();
+            //    Mock<IServiceProvider> storageServiceProvider = GetServiceProvider();
 
-        //    var Response = await service.GetStoreStorageByCode(data.Code);
-        //    Assert.NotNull(Response);
-        //}
+            //    StoreService service = new StoreService(serviceProvider.Object);
+            //    StorageService storageService = new StorageService(serviceProvider.Object);
+
+            //    serviceProvider.Setup(s => s.GetService(typeof(StoreService))).Returns(service);
+            //    serviceProvider.Setup(s => s.GetService(typeof(CoreDbContext))).Returns(dbContext);
+
+            //    storageServiceProvider.Setup(s => s.GetService(typeof(StorageService))).Returns(storageService);
+            //    storageServiceProvider.Setup(s => s.GetService(typeof(CoreDbContext))).Returns(dbContext);
+
+            //    var dataStorage = await _dataUtilStorage(storageService).GetTestDataAsync();
+            //    var data = _dataUtil(service).GetNewData();
+            //    data.Code = dataStorage.Code;
+            //    var createdData = await service.CreateAsync(data);
+
+            //    var Response = await service.GetStoreStorageByCode(data.Code);
+            //    Assert.NotNull(Response);
+            //}
 
     }
 }
