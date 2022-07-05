@@ -32,7 +32,7 @@ namespace Com.Everyday.Service.Core.Test.DataUtils
                 Name = string.Format("StorageName {0}", guid),
                 Code = "code",
                 StoreCategory="cat",
-                
+                City="city"
             };
         }
 
