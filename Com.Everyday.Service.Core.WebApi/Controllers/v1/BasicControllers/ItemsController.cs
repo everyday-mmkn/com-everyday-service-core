@@ -90,11 +90,11 @@ namespace Com.DanLiris.Service.Core.WebApi.Controllers.v1.BasicControllers
             try
             {
 
-               // service.Username = User.Claims.Single(p => p.Type.Equals("username")).Value;
+                // service.Username = User.Claims.Single(p => p.Type.Equals("username")).Value;
 
-                List<ItemViewModel> Data = await service.GetRO1(ro);
+                List<ItemViewModel> Data = await service.GetRONoImg(ro);
 
-                
+
 
                 Dictionary<string, object> Result =
                     new ResultFormatter(ApiVersion, General.OK_STATUS_CODE, General.OK_MESSAGE)
@@ -258,31 +258,31 @@ namespace Com.DanLiris.Service.Core.WebApi.Controllers.v1.BasicControllers
         }
 
 
-        [HttpPut("upload/image")]
+        [HttpPost("upload/image")]
         public async Task<IActionResult> ImgPost([FromBody]ItemViewModel viewModel)
         {
             try
             {
-              
+
 
                 //Service.Username = User.Claims.Single(p => p.Type.Equals("username")).Value;
                 //Service.Token = Request.Headers["Authorization"].First().Replace("Bearer ", "");
 
                 //if (Request.Form.Files.Count > 0)
                 //{
-                    var body = await service.ImgPost(viewModel);
+                var body = await service.ImgPost(viewModel);
 
 
-                    Dictionary<string, object> Result =
-                    new ResultFormatter(ApiVersion, General.CREATED_STATUS_CODE, General.OK_MESSAGE)
-                    .Ok();
-                    return Created(String.Concat(HttpContext.Request.Path, "/", 1), Result);
-               // }
+                Dictionary<string, object> Result =
+                new ResultFormatter(ApiVersion, General.CREATED_STATUS_CODE, General.OK_MESSAGE)
+                .Ok();
+                return Created(String.Concat(HttpContext.Request.Path, "/", 1), Result);
+                // }
                 //else {
 
                 //    return Ok();
                 //}
-                    
+
             }
             catch (ServiceValidationExeption e)
             {
