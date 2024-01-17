@@ -17,7 +17,7 @@ using Com.Moonlay.Models;
 
 namespace Com.DanLiris.Service.Core.Lib.Services
 {
-    public class ItemService : BasicService<CoreDbContext, Item>,  IMap<Item, ItemViewModel>
+    public class ItemService : BasicService<CoreDbContext, Item>, IMap<Item, ItemViewModel>
     {
 
         private const string UserAgent = "core-item-service";
@@ -28,7 +28,7 @@ namespace Com.DanLiris.Service.Core.Lib.Services
         {
             DbContext.Database.SetCommandTimeout(1000 * 60 * 2);
             //ServiceProvider = serviceProvider;
-            
+
         }
 
         public override Tuple<List<Item>, int, Dictionary<string, string>, List<string>> ReadModel(int Page = 1, int Size = 25, string Order = "{}", List<string> Select = null, string Keyword = null, string Filter = "{}")
@@ -55,7 +55,7 @@ namespace Com.DanLiris.Service.Core.Lib.Services
                 "_id", "dataDestination[0].code", "dataDestination[0].name", "dataDestination[0].ArticleRealizationOrder", "dataDestination[0].color", "dataDestination[0].ImagePath", "dataDestination[0].ImgFile"
             };
 
-            
+
 
             /* Order */
             if (OrderDictionary.Count.Equals(0))
@@ -179,7 +179,13 @@ namespace Com.DanLiris.Service.Core.Lib.Services
             itemVM.InternationalRetail = item.InternatioalRetail;
             itemVM.InternationalCOGS = item.InternatinalCOGS;
             itemVM.price = item.DomesticCOGS;
-
+            itemVM.code = item.Code;
+            itemVM.name = item.Name;
+            itemVM.Uom = item.Uom;
+            itemVM.Size = item.Size;
+            itemVM.ArticleRealizationOrder = item.ArticleRealizationOrder;
+            itemVM.ImageFile = item.ImgFile;
+            itemVM.ImagePath = item.ImagePath;
             itemVM.dataDestination = new List<ItemViewModelRead>{
                 new ItemViewModelRead {
                     ArticleRealizationOrder = item.ArticleRealizationOrder,
@@ -190,7 +196,7 @@ namespace Com.DanLiris.Service.Core.Lib.Services
                     ImagePath = item.ImagePath,
                     ImgFile = item.ImgFile,
                     color = item.ColorDocName
-                    
+
                 }
             };
             //itemVM.dataDestination.ArticleRealizationOrder = item.ArticleRealizationOrder;
@@ -572,19 +578,21 @@ namespace Com.DanLiris.Service.Core.Lib.Services
             Item item = DbContext.Items.FirstOrDefault(x => x.Id == Id && x._IsDeleted.Equals(false));
             if (!string.IsNullOrWhiteSpace(item.ImagePath))
             {
-                item.ImgFile = await this.AzureImageService.DownloadImage(item.GetType().Name, item.ImagePath);
+                item.ImgFile = await this.AzureImageService.DownloadImage(/*item.GetType().Name*/ String.Empty, item.ImagePath);
             }
             return item;
 
         }
 
-        public Task<List<ItemViewModel>> GetRO1( string RO)
+        public Task<List<ItemViewModel>> GetRO1(string RO)
         {
 
             var item = DbContext.Items.Where(x => x.ArticleRealizationOrder == RO);
             return item.Select(x => new ItemViewModel()
             {
                 _id = x.Id,
+                code = x.Code,
+                name = x.Name,
                 dataDestination = new List<ItemViewModelRead>() { new ItemViewModelRead() { code = x.Code, name = x.Name, ArticleRealizationOrder = x.ArticleRealizationOrder, _id = x.Id, Description = x.Description, ImagePath = x.ImagePath, Remark = x.Remark, Size = x.Size, Tags = x.Tags, Uom = x.Uom } },
                 DomesticCOGS = x.DomesticCOGS,
                 DomesticRetail = x.DomesticRetail,
@@ -598,24 +606,42 @@ namespace Com.DanLiris.Service.Core.Lib.Services
             }).ToListAsync();
         }
 
+        public Task<List<ItemViewModel>> GetRONoImg(string RO)
+        {
+
+            var item = DbContext.Items.Where(x => x.ArticleRealizationOrder == RO && (x.ImagePath == null || x.ImagePath == ""));
+            return item.Select(x => new ItemViewModel()
+            {
+                _id = x.Id,
+                code = x.Code,
+                name = x.Name,
+                dataDestination = new List<ItemViewModelRead>() { new ItemViewModelRead() { code = x.Code, name = x.Name, ArticleRealizationOrder = x.ArticleRealizationOrder, _id = x.Id, Description = x.Description, ImagePath = x.ImagePath, Remark = x.Remark, Size = x.Size, Tags = x.Tags, Uom = x.Uom } },
+                DomesticCOGS = x.DomesticCOGS,
+                DomesticRetail = x.DomesticRetail,
+                DomesticSale = x.DomesticSale,
+                DomesticWholesale = x.DomesticWholesale,
+                InternationalCOGS = x.InternatinalCOGS,
+                InternationalRetail = x.InternatioalRetail,
+                InternationalSale = x.InternationalSale,
+                InternationalWholesale = x.InternationalWholesale,
+                price = 0
+            }).ToListAsync();
+        }
         public Task<List<ItemLoader>> GetRO2(string RO)
         {
 
             var item = DbContext.Items.Where(x => x.ArticleRealizationOrder == RO);
             return item.Select(x => new ItemLoader()
             {
-                //code = x.Code,
-                //name = x.Name,
+
                 //ArticleRealizationOrder = x.ArticleRealizationOrder,
                 //_id = x.Id,
                 //Description = x.Description,
                 //ImagePath = x.ImagePath,
-                //Remark = x.Remark,
-                //Size = x.Size,
-                //Tags = x.Tags,
-                //Uom = x.Uom,
+
 
                 dataDestination = new ItemViewModelRead { code = x.Code, name = x.Name, ArticleRealizationOrder = x.ArticleRealizationOrder, _id = x.Id, Description = x.Description, ImagePath = x.ImagePath, Remark = x.Remark, Size = x.Size, Tags = x.Tags, Uom = x.Uom },
+
                 DomesticCOGS = x.DomesticCOGS,
                 DomesticRetail = x.DomesticRetail,
                 DomesticSale = x.DomesticSale,
@@ -722,7 +748,7 @@ namespace Com.DanLiris.Service.Core.Lib.Services
         public Task<List<ItemViewModel>> GetImage(string imagePath)
         {
 
-            var item = DbContext.Items.Where(x =>  x.ImagePath == imagePath);
+            var item = DbContext.Items.Where(x => x.ImagePath == imagePath);
             return item.Select(x => new ItemViewModel()
             {
                 _id = x.Id,
@@ -745,12 +771,12 @@ namespace Com.DanLiris.Service.Core.Lib.Services
         //}
 
         public virtual async Task<int> ImgPost(ItemViewModel model)
-        { 
+        {
             Item model2 = new Item();
             string IMagePath = "";
             if (!string.IsNullOrWhiteSpace(model.ImageFile))
             {
-                IMagePath = await this.AzureImageService.UploadImage(model2.GetType().Name, model._id, model._createdDate, model.ImageFile);
+                IMagePath = await this.AzureImageService.UploadImage(/*model2.GetType().Name*/String.Empty, model._id, model._createdDate, model.ImageFile);
             }
 
             foreach (var data in model.dataDestination)
@@ -831,7 +857,7 @@ namespace Com.DanLiris.Service.Core.Lib.Services
         public async Task<int> UpdateTotalQtyAsync(int id, double totalQty, string username)
         {
             Item item = DbContext.Items.Where(y => y.Id == id).FirstOrDefault();
-            if(item != null)
+            if (item != null)
             {
                 item.TotalQty = item.TotalQty + totalQty;
             }
@@ -843,7 +869,7 @@ namespace Com.DanLiris.Service.Core.Lib.Services
         public async Task<int> ReduceTotalQtyAsync(int id, double totalQty, string username)
         {
             Item item = DbContext.Items.Where(y => y.Id == id).FirstOrDefault();
-            if(item != null)
+            if (item != null)
             {
                 item.TotalQty = item.TotalQty - totalQty;
             }
